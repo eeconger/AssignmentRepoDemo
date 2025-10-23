@@ -1,11 +1,15 @@
 import express from "express";
-import { insertMany } from "./mongodb.ts";
+import { Routes } from "./routes";
+// import { insertMany } from "./mongodb";
 
 export const app = express();
+app.use(express.json())
+new Routes();
 
-const port = 8080;
+const port = 3000;
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });
 
+// Register routes
