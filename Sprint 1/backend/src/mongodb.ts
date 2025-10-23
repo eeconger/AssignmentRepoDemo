@@ -42,8 +42,7 @@ export default class MongoDB {
      * @return Promise that resolves to an access token for the new user's session, or rejects on error.
      */
     public async registerNewUser(username: string, password: string): Promise<string | null> {
-        // const userdef: WithId<BSON.Document> | null = (await this.getAuthCollection().findOne({"type": "userdef"}, {"projection": {[`list.${username}`]: 1, _id: 0}}).then((result) => result?.list ?? null))[username];
-        
+        // TODO: Must disallow register if username already exists
         const salt = this.security.generateSalt();
         const hashedPassword = this.security.hash(password, salt);
         
@@ -65,32 +64,6 @@ export default class MongoDB {
     public generateAccessToken(): string {
         return this.security.generateAccessToken().toString();
     }
-
-    // public boolean checkCredentials(String uname, String pword) {
-    //     boolean valid = false;
-    //     try {
-    //         MongoCollection<Document> auth = db.getCollection("auth");
-    //         Document creds = auth.find().first();
-    //         Set<String> keys = creds.keySet();
-    //         keys.remove("_id");
-    //         keys.remove("activeSessions");
-    //         String[] keysArray = keys.toArray(new String[1]);
-    //         for(int i = 0; i < keysArray.length; i++) {
-    //             String person = keysArray[i];
-    //             if(!person.equals("_id")) {
-    //                 if(((Document) creds.get(person)).get("username").toString().equals(uname)) {
-                        // if(this.crypto.decrypt(((Document) creds.get(person)).get("password").toString()).equals(this.crypto.saltedHash(pword, uname))) {
-    //                         valid = true;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-    //     return valid;
-    // }
 
     public async getAllUsers(): Promise<WithId<Document>[]> {
         let collection = this.getAuthCollection();
