@@ -4,6 +4,7 @@ My groupmembers are:
 - Manu
 - David
 - Anoushka
+- Colin
 
 
 ------------------ Fill in some information about your project under this ------------------
