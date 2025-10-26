@@ -1,24 +1,30 @@
 import express from "express";
 import { Routes } from "./routes";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+import cors from "cors";
 
-// Load .env
 dotenv.config();
 
-// Create API instance
 export const app = express();
 
-// Make API instance auto-decode JSON body
-app.use(express.json())
+// CORS configuration
+app.use(
+  cors({
+    origin: "http://localhost:3001",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-// Register API routes
+// Body parsing middleware
+app.use(express.json());
+
+// Register routes
 const routes = new Routes();
-routes.registerRoutes();
+routes.registerRoutes(app);
 
-// Get the port from the environment variables
-const port = process.env.PORT!;
-
-// Start the server
+const port = process.env.PORT || "3000";
 app.listen(port, () => {
-    console.log(`Equanimity backend listening on port ${port}`);
+  console.log(`Equanimity backend listening on port ${port}`);
 });

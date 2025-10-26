@@ -2,7 +2,6 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "main.ts",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
@@ -14,12 +13,14 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongodb": "^6.20.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.3",
     "@types/mongodb": "^4.0.7",
