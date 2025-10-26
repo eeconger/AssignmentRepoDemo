@@ -26,10 +26,11 @@ const SignInPage: React.FC = () => {
 
     try {
       const sessionToken = await apiSignIn(email, password);
-
+      
       auth.login(sessionToken);
-
+      
       navigate("/");
+
     } catch (err: any) {
       setError(err.message || "Sign in failed. Please check your credentials.");
     } finally {
@@ -38,10 +39,12 @@ const SignInPage: React.FC = () => {
   };
 
   return (
-    // ✅ Wrap everything in a single div
-    <div className="w-full">
+    // ✅ Apply a max-width to the root div to constrain the card
+    <div className="w-full max-w-md">
       <h2 className="text-2xl font-bold mb-4">Sign In [PR03]</h2>
-      <p className="mb-6 text-gray-600">Sign in to continue to your account.</p>
+      <p className="mb-6 text-gray-600">
+        Sign in to continue to your account.
+      </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -92,7 +95,10 @@ const SignInPage: React.FC = () => {
       </form>
 
       <div className="text-center mt-6">
-        <Link to="/welcome" className="text-sm text-indigo-600 hover:underline">
+        <Link
+          to="/welcome"
+          className="text-sm text-indigo-600 hover:underline"
+        >
           Back to Welcome
         </Link>
       </div>
