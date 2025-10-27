@@ -59,7 +59,7 @@ export class Routes {
         // Route to register a new user
         app.post("/auth", (req, res) => {
             console.log(req)
-            this.mongo.registerNewUser(req.body.username, req.body.password).then(async (result) => {
+            this.mongo.registerNewUser(req.body.username, req.body.password, req.body.displayName, req.body.email).then(async (result) => {
                 if(result) {
                     res.status(200).send((await this.mongo.registerNewSession(req.body.username)));
                 }

@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { BSON, Collection, Db, Decimal128, Document, MongoClient, UpdateResult, WithId } from "mongodb";
 import Security from "./security";
+import { EmailAddress } from "./util";
 
 export default class MongoDB {
     private connectionURL: string;
@@ -37,6 +38,13 @@ export default class MongoDB {
      */
     public getAuthCollection(): Collection<Document> {
         return this.getDb().collection("auth");
+    }
+
+    /**
+     * @returns The userLogging collection in the equanimity database
+     */
+    public getUserLoggingCollection(): Collection<Document> {
+        return this.getDb().collection("userLogging");
     }
 
     /**
@@ -79,17 +87,33 @@ export default class MongoDB {
      * @param password plaintext password
      * @return Promise that resolves to true if the user was successfully registered, false otherwise
      */
-    public async registerNewUser(username: string, password: string): Promise<boolean> {
-        // TODO: Must disallow register if username already exists
+    public async registerNewUser(username: string, password: string, displayName: string, email: EmailAddress): Promise<boolean> {
         const salt = this.security.generateSalt();
         const hashedPassword = this.security.hash(password, salt);
+
+        const userAlreadyExists = await this.getUserLoggingCollection().findOne({username: username}).then((result) => result !== null);
+        if (userAlreadyExists) {
+            return false;
+        }
+
+        const loggingId = await this.getUserLoggingCollection()
+            .insertOne({
+                // _id: new BSON.ObjectId(),
+                username: username,
+                preferredPositiveHabits: [],
+                preferredNegativeHabits: [],
+                preferredPositiveStates: [],
+                preferredNegativeStates: [],
+                data: []
+            })
+            .then((result) => result.insertedId);
 
         return this.getAuthCollection()
             .updateOne(
                 {type: "userdef"},
                 {
                     $set: {
-                        [`list.${username}`]: {password: hashedPassword, salt: salt}
+                        [`list.${username}`]: {password: hashedPassword, salt: salt, displayName: displayName, email: email, loggingId: loggingId}
                     }
                 }
             )
