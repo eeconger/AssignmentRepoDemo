@@ -1,0 +1,53 @@
+// src/constants.ts
+export const POSITIVE_STATES = [
+  "Happy",
+  "Calm",
+  "Focused",
+  "Excited",
+  "Grateful",
+  "Relaxed",
+  "Joyful",
+  "Content",
+  "Energized",
+  "Proud",
+  "Optimistic",
+  "Loved",
+];
+export const NEGATIVE_STATES = [
+  "Stressed",
+  "Anxious",
+  "Tired",
+  "Sad",
+  "Angry",
+  "Overwhelmed",
+  "Frustrated",
+  "Lonely",
+  "Bored",
+  "Irritable",
+  "Insecure",
+  "Guilty",
+];
+export const POSITIVE_HABITS = [
+  "Exercise",
+  "Meditate",
+  "Read",
+  "Sleep Well",
+  "Healthy Eating",
+  "Journaling",
+  "Hydration",
+  "Connecting with Loved Ones",
+  "Time for Hobbies",
+  "Planning my Day",
+];
+export const NEGATIVE_HABITS = [
+  "Procrastinate",
+  "Junk Food",
+  "Smoking",
+  "Poor Sleep",
+  "Excessive Screen Time",
+  "Skipping Meals",
+  "Negative Self-Talk",
+  "Impulse Buying",
+  "Oversleeping",
+  "Avoiding Tasks",
+];
