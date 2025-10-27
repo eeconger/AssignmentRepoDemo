@@ -13,6 +13,7 @@ export const POSITIVE_STATES = [
   "Optimistic",
   "Loved",
 ];
+
 export const NEGATIVE_STATES = [
   "Stressed",
   "Anxious",
@@ -27,6 +28,7 @@ export const NEGATIVE_STATES = [
   "Insecure",
   "Guilty",
 ];
+
 export const POSITIVE_HABITS = [
   "Exercise",
   "Meditate",
@@ -39,6 +41,7 @@ export const POSITIVE_HABITS = [
   "Time for Hobbies",
   "Planning my Day",
 ];
+
 export const NEGATIVE_HABITS = [
   "Procrastinate",
   "Junk Food",
