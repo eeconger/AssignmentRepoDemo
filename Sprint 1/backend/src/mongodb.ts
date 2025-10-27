@@ -44,7 +44,7 @@ export default class MongoDB {
    * @returns The users collection in the equanimity database
    */
   public getUsersCollection(): Collection {
-    return this.getDb().collection("users");
+    return this.getDb().collection("userLogging");
   }
   // ---------------------------------------------------
 
