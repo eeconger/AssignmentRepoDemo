@@ -96,8 +96,8 @@ export default class MongoDB {
         // Check if the user already exists, then exit the function with a failure if they do.
         // Criterion for user existing: a userLogging document exists with the given username.
         const userAlreadyExists = await this.getUserLoggingCollection().findOne({username: username}).then((result) => result !== null);
-        if (userAlreadyExists) {
-            return false; // This will end the function early, and only runs if the user exists
+        if (userAlreadyExists || username.includes(".") || username.includes(" ")) {
+            return false; // This will end the function early, and only runs if the user exists or the username is invalid
         }
 
         // Create a userLogging document for the user, and store the ID so we can reference it in their userdef
