@@ -59,7 +59,7 @@ export default class MongoDB {
                 .findOne({type: "userdef"}, {projection: {[`list.${username}`]: 1, _id: 0}})
                 .then((result) => result?.list ?? null)
         )[username];
-        if (user) {
+        if(user) {
             return this.security.hash(password, user.salt) === user.password;
         }
         return false;
@@ -88,17 +88,21 @@ export default class MongoDB {
      * @return Promise that resolves to true if the user was successfully registered, false otherwise
      */
     public async registerNewUser(username: string, password: string, displayName: string, email: EmailAddress): Promise<boolean> {
+        // Hash the password before storing it on the database for security.
+        // Keep the salt so we can store it alongside the hash for logins.
         const salt = this.security.generateSalt();
         const hashedPassword = this.security.hash(password, salt);
 
+        // Check if the user already exists, then exit the function with a failure if they do.
+        // Criterion for user existing: a userLogging document exists with the given username.
         const userAlreadyExists = await this.getUserLoggingCollection().findOne({username: username}).then((result) => result !== null);
         if (userAlreadyExists) {
-            return false;
+            return false; // This will end the function early, and only runs if the user exists
         }
 
+        // Create a userLogging document for the user, and store the ID so we can reference it in their userdef
         const loggingId = await this.getUserLoggingCollection()
             .insertOne({
-                // _id: new BSON.ObjectId(),
                 username: username,
                 preferredPositiveHabits: [],
                 preferredNegativeHabits: [],
@@ -108,6 +112,8 @@ export default class MongoDB {
             })
             .then((result) => result.insertedId);
 
+        // Add the user to the auth collection in the userdef document. Userdef includes the following info:
+        // Username, hashed password, salt for the hash, display name, email, ID of the user's logging document
         return this.getAuthCollection()
             .updateOne(
                 {type: "userdef"},
@@ -118,27 +124,27 @@ export default class MongoDB {
                 }
             )
             .then((updateResult: UpdateResult) => {
-                if (updateResult.modifiedCount === 1) {
+                // If we successfully modified the document, return true. Otherwise there's an error.
+                if(updateResult.modifiedCount === 1) {
                     return true;
-                } else {
+                }
+                else {
                     return false;
                 }
-            })
-            .catch(() => false);
+            });
     }
 
     /**
      * Registers a new session for the given user
      * @param username plaintext username
-     * @returns Promise that resolves to a session ID if the operation was successful, null otherwise
+     * @returns Promise that resolves to an access token (an RFC4122 v4 UUID) if the operation was successful, null otherwise
      */
     public async registerNewSession(username: string): Promise<string | null> {
-        // 
         let issuedAt: Date = new Date();
         const expiresAt: Date = new Date(issuedAt.valueOf() + 1000 * 60 * 60 * 24 * 7); // (1000 * 60 * 60 * 24) * 7 === 7 days in ms
 
         // Check if the user has an existing session. If they do, accessToken becomes that session's ID.
-        // Otherwise, generate a new access token for the user.
+        // Otherwise, generate a new access token for the user. Access tokens are RFC4122 v4 UUIDs.
         const accessToken = await this.getAuthCollection()
             .findOne({type: "activesessions"})
             .then((result) => {
@@ -147,6 +153,8 @@ export default class MongoDB {
                 );
             });
 
+        // Add a session to the auth collection in the activesessions document. Activesessions includes the following info:
+        // Username, issue date and time, expiration date and time.
         return await this.getAuthCollection()
             .updateOne(
                 {type: "activesessions"},
@@ -161,6 +169,7 @@ export default class MongoDB {
                 }
             )
             .then((result) => {
+                // If we successfully modified the document, return the new accessToken. Otherwise there's an error.
                 if (result.modifiedCount === 1) {
                     return accessToken;
                 }
@@ -185,6 +194,7 @@ export default class MongoDB {
                                     $objectToArray: "$list"
                                 },
                                 as: "session",
+                                // "condition: session expires at is greater than right now"
                                 cond: {
                                     $gt: [{$toDate: "$$session.v.expiresAt"}, new Date()]
                                 }
