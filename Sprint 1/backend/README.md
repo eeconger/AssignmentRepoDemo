@@ -12,5 +12,7 @@ Setup environment variables:
 
 ## Testing the API
 1. Install the "REST Client" VSCode extension
-2. Create a file called `test.http` in any directory
-3. Create a test request. Look up "REST Client document specification" for guidance. Reference the `routes.ts` file in `Sprint 1/backend/src` to see what routes are appropriate.
+2. Open the test.http file in this folder
+3. Create a test request or use one of the sample ones. Look up "REST Client document specification" for guidance. Reference the `routes.ts` file in `Sprint 1/backend/src` to see what routes are appropriate and what information they require.
+4. In your terminal, navigate to the `Sprint 1/backend/` folder (see guidance in Installation and Setup)
+5. Run `npm run dev`
