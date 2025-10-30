@@ -109,7 +109,7 @@ export class Routes {
 
       // 1. Check authorization and get user email
       this.mongo
-        .getUserBySession(accessToken)
+        .checkSession(accessToken)
         .then(async (userEmail) => {
           if (!userEmail) {
             return res.status(401).send("Invalid or expired session.");
