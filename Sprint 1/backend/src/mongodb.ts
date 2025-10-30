@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
-import { BSON, Collection, Db, Decimal128, Document, MongoClient, UpdateResult, WithId } from "mongodb";
+import {MongoClient, BSON, Decimal128, Collection, WithId, UpdateResult} from "mongodb";
 import Security from "./security";
-import { EmailAddress } from "./util";
 
 export default class MongoDB {
     private connectionURL: string;
@@ -16,8 +15,8 @@ export default class MongoDB {
         dotenv.config();
 
         // Connect to MongoDB
-        this.connectionURL = process.env.CONNECTION_STRING!
-            .replace("<db_username>", process.env.USERNAME!)
+        this.connectionURL = process.env
+            .CONNECTION_STRING!.replace("<db_username>", process.env.USERNAME!)
             .replace("<db_password>", process.env.PASSWORD!);
         this.client = new MongoClient(this.connectionURL);
         this.client.connect();
@@ -29,23 +28,24 @@ export default class MongoDB {
     /**
      * @returns The equanimity database
      */
-    public getDb(): Db {
+    public getDb() {
         return this.client.db("equanimity");
     }
 
     /**
      * @returns The auth collection in the equanimity database
      */
-    public getAuthCollection(): Collection<Document> {
+    public getAuthCollection() {
         return this.getDb().collection("auth");
     }
 
     /**
      * @returns The userLogging collection in the equanimity database
      */
-    public getUserLoggingCollection(): Collection<Document> {
+    public getUserLoggingCollection(): Collection {
         return this.getDb().collection("userLogging");
     }
+    // ---------------------------------------------------
 
     /**
      * Checks if a plaintext username and password match a user in the database
@@ -59,7 +59,7 @@ export default class MongoDB {
                 .findOne({type: "userdef"}, {projection: {[`list.${username}`]: 1, _id: 0}})
                 .then((result) => result?.list ?? null)
         )[username];
-        if(user) {
+        if (user) {
             return this.security.hash(password, user.salt) === user.password;
         }
         return false;
@@ -68,17 +68,19 @@ export default class MongoDB {
     /**
      * Checks if a user's session is in the database
      * @param accessToken the unique access token assigned to the user at login
-     * @returns Promise that resolves to true if the access token is in the database
-     *          and unexpired, false otherwise.
+     * @returns Promise that resolves to the session username if the access token
+     *          is in the database and unexpired, empty string otherwise.
      */
-    public async checkSession(accessToken: string): Promise<boolean> {
+    public async checkSession(accessToken: string): Promise<string> {
         // Clear expired sessions first, so if the accessToken is tied to an expired session it is marked as invalid
         await this.clearExpiredSessions();
         // Filter the activesessions document by the given accessToken
-        return this.getAuthCollection().findOne({type: "activesessions"}, {projection: {[`list.${accessToken}`]: 1, _id: 0}}).then((result) => {
-            // If the session is returned, return true. False otherwise.
-            return result!.list[accessToken] ? true : false;
-        })
+        return this.getAuthCollection()
+            .findOne({type: "activesessions"}, {projection: {[`list.${accessToken}`]: 1, _id: 0}})
+            .then((result) => {
+                // If the session is returned, return true. False otherwise.
+                return result!.list[accessToken] ? result!.list[accessToken].username : null;
+            });
     }
 
     /**
@@ -87,7 +89,7 @@ export default class MongoDB {
      * @param password plaintext password
      * @return Promise that resolves to true if the user was successfully registered, false otherwise
      */
-    public async registerNewUser(username: string, password: string, displayName: string, email: EmailAddress): Promise<boolean> {
+    public async registerNewUser(username: string, password: string, displayName: string, email: `${string}@${string}.${string}`): Promise<boolean> {
         // Hash the password before storing it on the database for security.
         // Keep the salt so we can store it alongside the hash for logins.
         const salt = this.security.generateSalt();
@@ -95,7 +97,9 @@ export default class MongoDB {
 
         // Check if the user already exists, then exit the function with a failure if they do.
         // Criterion for user existing: a userLogging document exists with the given username.
-        const userAlreadyExists = await this.getUserLoggingCollection().findOne({username: username}).then((result) => result !== null);
+        const userAlreadyExists = await this.getUserLoggingCollection()
+            .findOne({username: username})
+            .then((result) => result !== null);
         if (userAlreadyExists || username.includes(".") || username.includes(" ")) {
             return false; // This will end the function early, and only runs if the user exists or the username is invalid
         }
@@ -119,21 +123,46 @@ export default class MongoDB {
                 {type: "userdef"},
                 {
                     $set: {
-                        [`list.${username}`]: {password: hashedPassword, salt: salt, displayName: displayName, email: email, loggingId: loggingId}
+                        [`list.${username}`]: {
+                            password: hashedPassword,
+                            salt: salt,
+                            displayName: displayName,
+                            email: email,
+                            loggingId: loggingId
+                        }
                     }
                 }
             )
             .then((updateResult: UpdateResult) => {
                 // If we successfully modified the document, return true. Otherwise there's an error.
-                if(updateResult.modifiedCount === 1) {
+                if (updateResult.modifiedCount === 1) {
                     return true;
-                }
-                else {
+                } else {
                     return false;
                 }
             });
     }
 
+    /**
+     * Updates the user's profile data in the dedicated 'users' collection.
+     * @param email The user's email/username identifier.
+     * @param data An object containing fields to update (e.g., displayName, states, habits).
+     * @returns Promise that resolves to true if the update was successful, false otherwise.
+     */
+    public async updateUserProfile(email: string, data: any): Promise<boolean> {
+        // Filter out undefined values to only $set what is provided
+        const updatePayload = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
+
+        const updateResult = await this.getUserLoggingCollection().updateOne(
+            {email: email},
+            {$set: updatePayload},
+            {upsert: false} // Profile should already exist
+        );
+
+        // Return true if the document was modified
+        return updateResult.modifiedCount === 1;
+    }
+    
     /**
      * Registers a new session for the given user
      * @param username plaintext username
@@ -206,28 +235,23 @@ export default class MongoDB {
         ]);
     }
 
-    // Currently unused. Converts a BSON document to a JSON document.
-    private bsonToJson(bson: WithId<Document>[]) {
-        return bson.map((inputItem: WithId<Document>) => {
+    // Currently unused.
+    public bsonToJson(bson: any[]): any[] {
+        return bson.map((inputItem) => {
             let resultItem = {...inputItem};
             let keys = Object.keys(resultItem);
             for (let i = 0; i < Object.keys(resultItem).length; i++) {
                 let currentKey = keys[i];
                 if (resultItem[currentKey] instanceof BSON.BSONValue) {
-                    // && resultItem[currentKey] !== null) {
-                    console.log(resultItem[currentKey]);
                     if (resultItem[currentKey] instanceof Decimal128) {
-                        console.log("passed");
                         resultItem[currentKey] = parseFloat(resultItem[currentKey].toString());
                     } else {
-                        /* @ts-ignore: all relevant classes that implement BSONValue have .toJSON() */
+                        /* @ts-ignore */
                         resultItem[currentKey] = resultItem[currentKey].toJSON();
                     }
                 }
             }
-            console.log(resultItem);
             return resultItem;
-            // return {...resultItem, _id: resultItem._id.toString()}
         });
     }
 }
