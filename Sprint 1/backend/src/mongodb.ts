@@ -89,7 +89,7 @@ export default class MongoDB {
      * @param password plaintext password
      * @return Promise that resolves to true if the user was successfully registered, false otherwise
      */
-    public async registerNewUser(username: string, password: string, displayName: string, email: `${string}@${string}.${string}`): Promise<boolean> {
+    public async registerNewUser(username: string, email: `${string}@${string}.${string}`, password: string): Promise<boolean> {
         // Hash the password before storing it on the database for security.
         // Keep the salt so we can store it alongside the hash for logins.
         const salt = this.security.generateSalt();
@@ -124,10 +124,9 @@ export default class MongoDB {
                 {
                     $set: {
                         [`list.${username}`]: {
+                            email: email,
                             password: hashedPassword,
                             salt: salt,
-                            displayName: displayName,
-                            email: email,
                             loggingId: loggingId
                         }
                     }
@@ -145,16 +144,16 @@ export default class MongoDB {
 
     /**
      * Updates the user's profile data in the dedicated 'users' collection.
-     * @param email The user's email/username identifier.
+     * @param username The user's username identifier.
      * @param data An object containing fields to update (e.g., displayName, states, habits).
      * @returns Promise that resolves to true if the update was successful, false otherwise.
      */
-    public async updateUserProfile(email: string, data: any): Promise<boolean> {
+    public async updateUserProfile(username: string, data: any): Promise<boolean> {
         // Filter out undefined values to only $set what is provided
         const updatePayload = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
 
         const updateResult = await this.getUserLoggingCollection().updateOne(
-            {email: email},
+            {username: username},
             {$set: updatePayload},
             {upsert: false} // Profile should already exist
         );

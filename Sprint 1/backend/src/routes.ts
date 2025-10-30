@@ -64,20 +64,22 @@ export class Routes {
 
     // Route to register a new user (UC01: Basic Path Step 2)
     app.post("/auth", (req, res) => {
-      const { username, password, termsAccepted } = req.body;
+      const { username, email, password, termsAccepted } = req.body;
 
+      // TODO: These checks should happen on the frontend
       // Enforce BR01 - Password minimum (E01)
       if (!password || password.length < 12) {
         return res.status(400).send("Password must be at least 12 characters."); // [E01]
       }
 
+    // TODO: These checks should happen on the frontend
       // Enforce BR03 - Terms & Conditions must be accepted
       if (termsAccepted !== true) {
         return res.status(400).send("Terms & Conditions must be accepted.");
       }
 
       this.mongo
-        .registerNewUser(username, password)
+        .registerNewUser(username, email, password)
         .then(async (result) => {
           if (result) {
             res.status(200).send(await this.mongo.registerNewSession(username));
@@ -85,7 +87,7 @@ export class Routes {
             // Could not create new user (e.g., username already exists)
             res
               .status(409)
-              .send("A user with that email/username already exists.");
+              .send("A user with that username already exists.");
           }
         })
         .catch(() => res.status(500).send("Server error during registration."));
@@ -125,10 +127,10 @@ export class Routes {
           // 3. Update User Profile with submitted data
           const updatePayload = {
             displayName: displayName, // Step 4
-            positiveStates: positiveStates, // Step 5
-            negativeStates: negativeStates, // Step 6
-            positiveHabits: positiveHabits, // Step 7
-            negativeHabits: negativeHabits, // Step 8
+            preferredPositiveStates: positiveStates, // Step 5
+            preferredNegativeStates: negativeStates, // Step 6
+            preferredPositiveHabits: positiveHabits, // Step 7
+            preferredNegativeHabits: negativeHabits, // Step 8
             // Mark onboarding complete if all fields are present (simplified check)
             onboardingComplete:
               displayName &&
