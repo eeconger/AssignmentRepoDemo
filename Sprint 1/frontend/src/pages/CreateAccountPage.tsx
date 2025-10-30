@@ -8,6 +8,7 @@ const CreateAccountPage: React.FC = () => {
     // Renaming 'email' state variable to 'username' for clarity
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
@@ -36,9 +37,15 @@ const CreateAccountPage: React.FC = () => {
             return;
         }
 
+        if(!email || !email.includes('@') || !email.substring(email.indexOf('@')).includes('.')) {
+            setError("Please enter a valid email address.")
+            return;
+        }
+
         try {
             const token = await apiCreateAccount({
-                username: username, // Using the renamed state variable
+                username,
+                email,
                 password,
                 termsAccepted
             });
@@ -77,6 +84,24 @@ const CreateAccountPage: React.FC = () => {
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         placeholder="Choose your username"
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                        Email Address
+                    </label>
+                    <input
+                        // Changed type from 'email' to 'text' and removed email validation requirement
+                        type="text"
+                        // Changed ID from 'email' to 'username'
+                        id="email"
+                        value={email}
+                        // Updated setter to setUsername
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="Enter your email address"
                     />
                 </div>
 
