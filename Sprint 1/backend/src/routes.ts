@@ -112,8 +112,8 @@ export class Routes {
       // 1. Check authorization and get user email
       this.mongo
         .checkSession(accessToken)
-        .then(async (userEmail) => {
-          if (!userEmail) {
+        .then(async (username) => {
+          if (!username) {
             return res.status(401).send("Invalid or expired session.");
           }
 
@@ -124,9 +124,8 @@ export class Routes {
               .send("Positive states require at least 3 selections."); // [E02]
           }
 
-          // 3. Update User Profile with submitted data
+          // 3. Update Userlogging Profile with submitted data
           const updatePayload = {
-            displayName: displayName, // Step 4
             preferredPositiveStates: positiveStates, // Step 5
             preferredNegativeStates: negativeStates, // Step 6
             preferredPositiveHabits: positiveHabits, // Step 7
@@ -144,8 +143,9 @@ export class Routes {
           };
 
           const updateSuccessful = await this.mongo.updateUserProfile(
-            userEmail,
-            updatePayload
+            username,
+            updatePayload,
+            displayName
           );
 
           if (updateSuccessful) {

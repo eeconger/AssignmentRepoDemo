@@ -148,9 +148,17 @@ export default class MongoDB {
      * @param data An object containing fields to update (e.g., displayName, states, habits).
      * @returns Promise that resolves to true if the update was successful, false otherwise.
      */
-    public async updateUserProfile(username: string, data: any): Promise<boolean> {
+    public async updateUserProfile(username: string, data: any, displayName?: string): Promise<boolean> {
         // Filter out undefined values to only $set what is provided
         const updatePayload = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
+
+        if(displayName) {
+            this.getAuthCollection().updateOne({type: "userdef"}, {
+                $set: {
+                    [`list.${username}.displayName`]: displayName
+                }
+            })
+        }
 
         const updateResult = await this.getUserLoggingCollection().updateOne(
             {username: username},
