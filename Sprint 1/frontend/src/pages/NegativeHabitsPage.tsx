@@ -1,4 +1,3 @@
-// src/pages/onboarding/NegativeHabitsPage.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "../context/OnboardingContext";
@@ -45,7 +44,8 @@ const NegativeHabitsPage: React.FC = () => {
         },
         token
       );
-      navigate("/");
+      // FIX: Navigate to the Onboarding Complete page, which is the final step.
+      navigate("/onboarding/complete");
     } catch (err: any) {
       setError(err.message || "Failed to save negative habits.");
     } finally {

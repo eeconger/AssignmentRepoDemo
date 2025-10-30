@@ -16,13 +16,13 @@ import CreateAccountPage from "./pages/CreateAccountPage";
 // Onboarding Pages
 import DisplayNamePage from "./pages/DisplayNamePage";
 import PositiveStatesPage from "./pages/PositiveStatesPage";
-// ✅ 1. IMPORT THE NEW PAGES
 import NegativeStatesPage from "./pages/NegativeStatesPage";
 import PositiveHabitsPage from "./pages/PositiveHabitsPage";
 import NegativeHabitsPage from "./pages/NegativeHabitsPage";
+import OnboardingCompletePage from "./pages/OnboardingCompletePage";
 
 // App Page
-// import DashboardPage from "./pages/DashboardPage";
+// import DashboardPage from "./pages/DashboardPage"; // Dashboard is not yet implemented
 
 export default function App() {
   return (
@@ -50,7 +50,6 @@ export default function App() {
             path="/onboarding/positive-states"
             element={<PositiveStatesPage />}
           />
-          {/* ✅ 2. ADD THE NEW ROUTES */}
           <Route
             path="/onboarding/negative-states"
             element={<NegativeStatesPage />}
@@ -63,15 +62,20 @@ export default function App() {
             path="/onboarding/negative-habits"
             element={<NegativeHabitsPage />}
           />
+          {/* The final step */}
+          <Route
+            path="/onboarding/complete"
+            element={<OnboardingCompletePage />}
+          />
         </Route>
       </Route>
 
-      {/* 3. MAIN APP (User is logged in) */}
+      {/* 3. MAIN APP (User is logged in) - Commented out Dashboard */}
       {/* <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
       </Route> */}
 
-      {/* 4. FALLBACK (Now redirects to the new root path) */}
+      {/* 4. FALLBACK (Redirects to the root path) */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

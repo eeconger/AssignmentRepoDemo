@@ -5,7 +5,8 @@ import { apiCreateAccount } from "../api";
 // ---------------------
 
 const CreateAccountPage: React.FC = () => {
-  const [email, setEmail] = useState("");
+  // Renaming 'email' state variable to 'username' for clarity
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,9 +30,15 @@ const CreateAccountPage: React.FC = () => {
       return;
     }
 
+    // [E02] Client-side check for username presence
+    if (!username) {
+      setError("Please enter a username.");
+      return;
+    }
+
     try {
       const token = await apiCreateAccount({
-        username: email,
+        username: username, // Using the renamed state variable
         password,
         termsAccepted,
       });
@@ -56,21 +63,25 @@ const CreateAccountPage: React.FC = () => {
       </h2>
 
       <form onSubmit={handleSubmit} className="w-full">
-        {/* Email Field */}
+        {/* Username Field (formerly Email) */}
         <div className="mb-4">
           <label
-            htmlFor="email"
+            htmlFor="username"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Email
+            Username
           </label>
           <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            // Changed type from 'email' to 'text' and removed email validation requirement
+            type="text"
+            // Changed ID from 'email' to 'username'
+            id="username"
+            value={username}
+            // Updated setter to setUsername
+            onChange={(e) => setUsername(e.target.value)}
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Choose your username"
           />
         </div>
 
@@ -91,6 +102,7 @@ const CreateAccountPage: React.FC = () => {
               required
               className="w-full px-4 py-2 pr-16 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               aria-describedby="password-hint"
+              placeholder="Enter your password"
             />
             <button
               type="button"
