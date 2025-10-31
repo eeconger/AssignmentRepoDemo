@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import WelcomePage from "./pages/WelcomePage";
 import SignInPage from "./pages/SignInPage";
 import CreateAccountPage from "./pages/CreateAccountPage";
+import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import SignOut from "./pages/SignOut";
 
 // Onboarding Pages
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/register" element={<CreateAccountPage />} />
+        <Route path="/terms" element={<TermsAndConditionsPage />} />
         <Route path="/signout" element={<SignOut />} />
       </Route>
 

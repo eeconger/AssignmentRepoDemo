@@ -152,6 +152,13 @@ const CreateAccountPage: React.FC = () => {
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
               I accept the Terms & Conditions
             </label>
+            <Link
+              to="/terms"
+              className="ml-2 w-5 h-5 rounded-full bg-gradient-to-r from-sky-500 to-purple-600 text-white text-xs flex items-center justify-center hover:from-sky-600 hover:to-purple-700 transition duration-200"
+              title="View Terms & Conditions"
+            >
+              ?
+            </Link>
           </div>
 
           {error && (
