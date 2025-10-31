@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import WelcomePage from "./pages/WelcomePage";
 import SignInPage from "./pages/SignInPage";
 import CreateAccountPage from "./pages/CreateAccountPage";
+import SignOut from "./pages/SignOut";
 
 // Onboarding Pages
 import DisplayNamePage from "./pages/DisplayNamePage";
@@ -22,20 +23,27 @@ import NegativeHabitsPage from "./pages/NegativeHabitsPage";
 import OnboardingCompletePage from "./pages/OnboardingCompletePage";
 
 // App Page
-// import DashboardPage from "./pages/DashboardPage"; // Dashboard is not yet implemented
+import DashboardPage from "./pages/DashboardPage";
+
+// Edit Pages
+import EditPositiveStatesPage from "./pages/EditPositiveStatesPage";
+import EditNegativeStatesPage from "./pages/EditNegativeStatesPage";
+import EditPositiveHabitsPage from "./pages/EditPositiveHabitsPage";
+import EditNegativeHabitsPage from "./pages/EditNegativeHabitsPage";
 
 export default function App() {
   return (
     <Routes>
-      {/* 1. AUTH ROUTES (User is logged out) */}
+      {/* Auth routes (user is logged out) */}
       <Route element={<AuthLayout />}>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/register" element={<CreateAccountPage />} />
+        <Route path="/signout" element={<SignOut />} />
       </Route>
 
-      {/* 2. ONBOARDING WIZARD (User is logged in) */}
+      {/* Onboarding wizard (user is logged in) */}
       <Route element={<ProtectedRoute />}>
         {" "}
         {/* Ensures user is logged in */}
@@ -70,12 +78,28 @@ export default function App() {
         </Route>
       </Route>
 
-      {/* 3. MAIN APP (User is logged in) - Commented out Dashboard */}
-      {/* <Route element={<ProtectedRoute />}>
+      {/* Main app (user is logged in) */}
+      <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardPage />} />
-      </Route> */}
+        <Route
+          path="/edit/positive-states"
+          element={<EditPositiveStatesPage />}
+        />
+        <Route
+          path="/edit/negative-states"
+          element={<EditNegativeStatesPage />}
+        />
+        <Route
+          path="/edit/positive-habits"
+          element={<EditPositiveHabitsPage />}
+        />
+        <Route
+          path="/edit/negative-habits"
+          element={<EditNegativeHabitsPage />}
+        />
+      </Route>
 
-      {/* 4. FALLBACK (Redirects to the root path) */}
+      {/* Fallback: redirect to the root path */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
