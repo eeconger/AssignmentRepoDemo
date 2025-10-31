@@ -58,50 +58,50 @@ const PositiveStatesPage: React.FC = () => {
   };
 
   return (
-    // ⭐️ CHANGE 1: Removed 'min-h-screen' and 'justify-center'. Used 'pt-12 pb-20' for safe vertical padding.
-    <div className="flex flex-col items-center bg-white pt-12 pb-20">
-      {/* Inner content container: Kept 'max-w-md' and added horizontal margin 'mx-4' for mobile safety.
-          Removed all vertical margins on this div. */}
+    <div className="flex flex-col items-center bg-white pt-8 pb-12">
+      {/* Inner content container */}
       <div className="w-full max-w-md mx-4 rounded-2xl">
         {/* Heading with gradient text */}
         <h1
-          className={`text-3xl font-bold mb-6 text-center ${gradientTextClass}`}
+          className={`text-3xl font-bold mb-4 text-center ${gradientTextClass}`}
         >
           Select Positive States
         </h1>
 
-        {/* Content area: Reduced bottom margin from mb-6 to mb-4 */}
+        {/* Content area */}
         <div className="w-full mb-4">
-          <p className="text-lg text-gray-700 mb-6 text-center">
+          <p className="text-lg text-gray-700 mb-4 text-center">
             These are moods and feelings you want to encourage:
           </p>
 
+          {/* Scrollable list container (max height constraint) */}
           <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
             <div className="flex flex-wrap gap-3 justify-center">
-            {POSITIVE_STATES.map((state) => {
-              const isSelected = onboardingData.positiveStates.includes(state);
+              {POSITIVE_STATES.map((state) => {
+                const isSelected =
+                  onboardingData.positiveStates.includes(state);
 
-              // Reduced vertical padding from py-2 to py-1.5 for a slightly shorter button
-              const baseClasses =
-                "px-4 py-1.5 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
+                // Reduced vertical padding from py-2 to py-1.5 for a slightly shorter button
+                const baseClasses =
+                  "px-4 py-1.5 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
 
-              const selectedClasses =
-                "bg-gradient-to-r from-sky-500 to-purple-600 text-white border-transparent";
+                const selectedClasses =
+                  "bg-gradient-to-r from-sky-500 to-purple-600 text-white border-transparent";
 
-              const unselectedClasses = `${gradientTextClass} bg-white border-purple-200 hover:border-purple-600`;
+                const unselectedClasses = `${gradientTextClass} bg-white border-purple-200 hover:border-purple-600`;
 
-              return (
-                <button
-                  key={state}
-                  onClick={() => handleToggleState(state)}
-                  className={`${baseClasses} ${
-                    isSelected ? selectedClasses : unselectedClasses
-                  }`}
-                >
-                  {state}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={state}
+                    onClick={() => handleToggleState(state)}
+                    className={`${baseClasses} ${
+                      isSelected ? selectedClasses : unselectedClasses
+                    }`}
+                  >
+                    {state}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -116,7 +116,7 @@ const PositiveStatesPage: React.FC = () => {
         )}
 
         {/* Buttons container */}
-        <div className="w-full">
+        <div className="w-full mt-4">
           <button
             onClick={handleNext}
             disabled={isLoading || onboardingData.positiveStates.length < 3}
