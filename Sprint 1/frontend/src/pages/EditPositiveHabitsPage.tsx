@@ -40,6 +40,11 @@ const EditPositiveHabitsPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (selectedHabits.length < 3) {
+      alert("Please select at least 3 positive habits.");
+      return;
+    }
+
     setSaving(true);
     try {
       await apiUpdateOnboardingProfile(
@@ -75,7 +80,7 @@ const EditPositiveHabitsPage: React.FC = () => {
 
         <div className="bg-white p-0 w-full mb-6">
           <p className="text-lg text-gray-700 mb-6 text-center">
-            Select positive habits you want to track:
+            Select at least 3 positive habits you want to track:
           </p>
 
           <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
@@ -109,7 +114,7 @@ const EditPositiveHabitsPage: React.FC = () => {
           </div>
 
           <p className="text-sm text-gray-500 mt-4 text-center">
-            Selected: {selectedHabits.length}
+            Selected: {selectedHabits.length} (minimum 3 required)
           </p>
         </div>
 
@@ -125,7 +130,7 @@ const EditPositiveHabitsPage: React.FC = () => {
           {/* Save Button with Gradient */}
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || selectedHabits.length < 3}
             className={primaryButtonClass}
           >
             {saving ? "Saving..." : "Save Changes"}

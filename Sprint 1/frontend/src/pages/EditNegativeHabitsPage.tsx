@@ -40,6 +40,11 @@ const EditNegativeHabitsPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (selectedHabits.length < 3) {
+      alert("Please select at least 3 negative habits.");
+      return;
+    }
+
     setSaving(true);
     try {
       await apiUpdateOnboardingProfile(
@@ -73,7 +78,7 @@ const EditNegativeHabitsPage: React.FC = () => {
 
         <div className="bg-white p-0 w-full mb-6">
           <p className="text-lg text-gray-700 mb-6 text-center">
-            Select negative habits you want to change:
+            Select at least 3 negative habits you want to change:
           </p>
 
           <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
@@ -107,7 +112,7 @@ const EditNegativeHabitsPage: React.FC = () => {
           </div>
 
           <p className="text-sm text-gray-500 mt-4 text-center">
-            Selected: {selectedHabits.length}
+            Selected: {selectedHabits.length} (minimum 3 required)
           </p>
         </div>
 
@@ -123,7 +128,7 @@ const EditNegativeHabitsPage: React.FC = () => {
           {/* Save Button with NEGATIVE Gradient (Purple to Red) */}
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || selectedHabits.length < 3}
             className={negativeButtonClass}
           >
             {saving ? "Saving..." : "Save Changes"}
