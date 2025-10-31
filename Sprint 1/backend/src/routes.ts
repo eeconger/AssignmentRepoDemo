@@ -72,14 +72,14 @@ export class Routes {
         return res.status(400).send("Password must be at least 12 characters."); // [E01]
       }
 
-    // TODO: These checks should happen on the frontend
+      // TODO: These checks should happen on the frontend
       // Enforce BR03 - Terms & Conditions must be accepted
       if (termsAccepted !== true) {
         return res.status(400).send("Terms & Conditions must be accepted.");
       }
 
       this.mongo
-        .registerNewUser(username, email, password)
+        .registerNewUser(username, password)
         .then(async (result) => {
           if (result) {
             res.status(200).send(await this.mongo.registerNewSession(username));
@@ -87,10 +87,35 @@ export class Routes {
             // Could not create new user (e.g., username already exists)
             res
               .status(409)
-              .send("A user with that username already exists.");
+              .send("A user with that email/username already exists.");
           }
         })
         .catch(() => res.status(500).send("Server error during registration."));
+    });
+
+    // Route to get user profile data for dashboard
+    app.get("/profile", (req, res) => {
+      const authHeader = req.header("Authorization");
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).send("Unauthorized: Missing Bearer token.");
+      }
+      const accessToken: string = authHeader.substring("Bearer ".length);
+
+      this.mongo
+        .getUserBySession(accessToken)
+        .then(async (userEmail) => {
+          if (!userEmail) {
+            return res.status(401).send("Invalid or expired session.");
+          }
+
+          const userProfile = await this.mongo.getUserProfile(userEmail);
+          if (userProfile) {
+            res.status(200).json(userProfile);
+          } else {
+            res.status(404).send("User profile not found.");
+          }
+        })
+        .catch(() => res.status(500).send("Server error retrieving profile."));
     });
 
     //Handle remaining onboarding steps (UC01: Basic Path Steps 4-10)
@@ -111,7 +136,7 @@ export class Routes {
 
       // 1. Check authorization and get user email
       this.mongo
-        .checkSession(accessToken)
+        .getUserBySession(accessToken)
         .then(async (userEmail) => {
           if (!userEmail) {
             return res.status(401).send("Invalid or expired session.");
@@ -124,24 +149,42 @@ export class Routes {
               .send("Positive states require at least 3 selections."); // [E02]
           }
 
-          // 3. Update User Profile with submitted data
-          const updatePayload = {
+          // 3. Get current user profile to check completeness
+          const currentProfile = await this.mongo.getUserProfile(userEmail);
+
+          // 4. Update User Profile with submitted data
+          const updatePayload: any = {
             displayName: displayName, // Step 4
             preferredPositiveStates: positiveStates, // Step 5
             preferredNegativeStates: negativeStates, // Step 6
             preferredPositiveHabits: positiveHabits, // Step 7
             preferredNegativeHabits: negativeHabits, // Step 8
-            // Mark onboarding complete if all fields are present (simplified check)
-            onboardingComplete:
-              displayName &&
-              positiveStates &&
-              positiveStates.length >= 3 &&
-              negativeStates &&
-              positiveHabits &&
-              negativeHabits
-                ? true
-                : undefined, // Set to true only on the final step
           };
+
+          // 5. Check if onboarding should be marked complete
+          const finalDisplayName = displayName || currentProfile?.displayName;
+          const finalPositiveStates =
+            positiveStates || currentProfile?.positiveStates;
+          const finalNegativeStates =
+            negativeStates || currentProfile?.negativeStates;
+          const finalPositiveHabits =
+            positiveHabits || currentProfile?.positiveHabits;
+          const finalNegativeHabits =
+            negativeHabits || currentProfile?.negativeHabits;
+
+          if (
+            finalDisplayName &&
+            finalPositiveStates &&
+            finalPositiveStates.length >= 3 &&
+            finalNegativeStates &&
+            finalNegativeStates.length > 0 &&
+            finalPositiveHabits &&
+            finalPositiveHabits.length > 0 &&
+            finalNegativeHabits &&
+            finalNegativeHabits.length > 0
+          ) {
+            updatePayload.onboardingComplete = true;
+          }
 
           const updateSuccessful = await this.mongo.updateUserProfile(
             userEmail,
