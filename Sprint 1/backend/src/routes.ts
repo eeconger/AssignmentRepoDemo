@@ -160,29 +160,19 @@ export class Routes {
             preferredPositiveHabits: positiveHabits, // Step 7
             preferredNegativeHabits: negativeHabits, // Step 8
           };
-
+          
           // 5. Check if onboarding should be marked complete
           const finalDisplayName = displayName || currentProfile?.displayName;
-          const finalPositiveStates =
-            positiveStates || currentProfile?.positiveStates;
-          const finalNegativeStates =
-            negativeStates || currentProfile?.negativeStates;
-          const finalPositiveHabits =
-            positiveHabits || currentProfile?.positiveHabits;
-          const finalNegativeHabits =
-            negativeHabits || currentProfile?.negativeHabits;
-
-          if (
-            finalDisplayName &&
-            finalPositiveStates &&
-            finalPositiveStates.length >= 3 &&
-            finalNegativeStates &&
-            finalNegativeStates.length > 0 &&
-            finalPositiveHabits &&
-            finalPositiveHabits.length > 0 &&
-            finalNegativeHabits &&
-            finalNegativeHabits.length > 0
-          ) {
+          const finalPositiveStates = positiveStates || currentProfile?.positiveStates;
+          const finalNegativeStates = negativeStates || currentProfile?.negativeStates;
+          const finalPositiveHabits = positiveHabits || currentProfile?.positiveHabits;
+          const finalNegativeHabits = negativeHabits || currentProfile?.negativeHabits;
+          
+          if (finalDisplayName && 
+              finalPositiveStates && finalPositiveStates.length >= 3 &&
+              finalNegativeStates && finalNegativeStates.length > 0 &&
+              finalPositiveHabits && finalPositiveHabits.length > 0 &&
+              finalNegativeHabits && finalNegativeHabits.length > 0) {
             updatePayload.onboardingComplete = true;
           }
 
