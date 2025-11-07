@@ -6,6 +6,13 @@ import { useAuth } from "../context/AuthContext";
 import { POSITIVE_STATES } from "../constants";
 import { apiUpdateOnboardingProfile } from "../api";
 
+// Custom class for gradient text (Blue to Purple)
+const gradientTextClass =
+  "bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-purple-600";
+// Class for the gradient button background (Blue to Purple)
+const primaryButtonClass =
+  "w-full px-6 py-3 text-white text-xl font-bold rounded-lg bg-gradient-to-r from-sky-500 to-purple-600 hover:from-sky-600 hover:to-purple-700 transition duration-300 shadow-lg disabled:opacity-50";
+
 const PositiveStatesPage: React.FC = () => {
   const { onboardingData, updateOnboardingData } = useOnboarding();
   const { token } = useAuth();
@@ -20,11 +27,10 @@ const PositiveStatesPage: React.FC = () => {
       : [...currentStates, state];
 
     updateOnboardingData({ positiveStates: newStates });
-    setError(null); // Clear error on selection
+    setError(null);
   };
 
   const handleNext = async () => {
-    // [E02] Enforce BR02 on the client
     if (onboardingData.positiveStates.length < 3) {
       setError("Please select at least 3 positive states.");
       return;
@@ -43,7 +49,7 @@ const PositiveStatesPage: React.FC = () => {
         { positiveStates: onboardingData.positiveStates },
         token
       );
-      navigate("/onboarding/negative-states"); // Go to next step
+      navigate("/onboarding/negative-states");
     } catch (err: any) {
       setError(err.message || "Failed to save positive states.");
     } finally {
@@ -52,37 +58,75 @@ const PositiveStatesPage: React.FC = () => {
   };
 
   return (
-    <>
-      <h2 className="text-2xl font-bold mb-4">Select Positive States [PR06]</h2>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {POSITIVE_STATES.map((state) => {
-          const isSelected = onboardingData.positiveStates.includes(state);
-          return (
-            <button
-              key={state}
-              onClick={() => handleToggleState(state)}
-              className={`px-4 py-2 rounded-full font-semibold ${
-                isSelected
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              {state}
-            </button>
-          );
-        })}
+    <div className="flex flex-col items-center bg-white pt-8 pb-12">
+      {/* Inner content container */}
+      <div className="w-full max-w-md mx-4 rounded-2xl">
+        {/* Heading with gradient text */}
+        <h1
+          className={`text-3xl font-bold mb-4 text-center ${gradientTextClass}`}
+        >
+          Select Positive States
+        </h1>
+
+        {/* Content area */}
+        <div className="w-full mb-4">
+          <p className="text-lg text-gray-700 mb-4 text-center">
+            These are moods and feelings you want to encourage:
+          </p>
+
+          {/* Scrollable list container (max height constraint) */}
+          <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
+            <div className="flex flex-wrap gap-3 justify-center">
+              {POSITIVE_STATES.map((state) => {
+                const isSelected =
+                  onboardingData.positiveStates.includes(state);
+
+                // Reduced vertical padding from py-2 to py-1.5 for a slightly shorter button
+                const baseClasses =
+                  "px-4 py-1.5 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
+
+                const selectedClasses =
+                  "bg-gradient-to-r from-sky-500 to-purple-600 text-white border-transparent";
+
+                const unselectedClasses = `${gradientTextClass} bg-white border-purple-200 hover:border-purple-600`;
+
+                return (
+                  <button
+                    key={state}
+                    onClick={() => handleToggleState(state)}
+                    className={`${baseClasses} ${
+                      isSelected ? selectedClasses : unselectedClasses
+                    }`}
+                  >
+                    {state}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500 mt-4 text-center">
+            Selected: {onboardingData.positiveStates.length} (minimum 3
+            required)
+          </p>
+        </div>
+
+        {error && (
+          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+        )}
+
+        {/* Buttons container */}
+        <div className="w-full mt-4">
+          <button
+            onClick={handleNext}
+            disabled={isLoading || onboardingData.positiveStates.length < 3}
+            className={primaryButtonClass}
+          >
+            {isLoading ? "Saving..." : "Continue"}
+          </button>
+        </div>
       </div>
-
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
-      <button
-        onClick={handleNext}
-        className="w-full px-6 py-3 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-300"
-        disabled={isLoading}
-      >
-        {isLoading ? "Saving..." : "Continue"}
-      </button>
-    </>
+    </div>
   );
 };
 

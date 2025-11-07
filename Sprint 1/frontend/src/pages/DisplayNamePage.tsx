@@ -5,6 +5,10 @@ import { useOnboarding } from "../context/OnboardingContext";
 import { useAuth } from "../context/AuthContext";
 import { apiUpdateOnboardingProfile } from "../api";
 
+// Custom class for gradient text
+const gradientTextClass =
+  "bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-purple-600";
+
 const DisplayNamePage: React.FC = () => {
   const { onboardingData, updateOnboardingData } = useOnboarding();
   const { token } = useAuth();
@@ -43,28 +47,48 @@ const DisplayNamePage: React.FC = () => {
   };
 
   return (
-    <>
-      <h2 className="text-2xl font-bold mb-4">Set Display Name [PR05]</h2>
-      <p className="mb-6">Please enter a name for your profile.</p>
-      <input
-        type="text"
-        className="w-full p-2 border rounded mb-6"
-        placeholder="Your display name"
-        value={onboardingData.displayName}
-        onChange={(e) => updateOnboardingData({ displayName: e.target.value })}
-        disabled={isLoading}
-      />
+    // Container for a single card layout
+    <div className="flex flex-col items-center w-full">
+      {/* Heading with gradient text */}
+      <h2
+        className={`text-3xl font-bold mb-4 text-center ${gradientTextClass}`}
+      >
+        Set Your Display Name
+      </h2>
+      <p className="mb-8 text-lg text-gray-700 text-center">
+        Please enter a name for your profile.
+      </p>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+      {/* Input field */}
+      <div className="w-full relative p-[2px] rounded-lg focus-within:bg-gradient-to-r focus-within:from-sky-500 focus-within:to-purple-600 mb-6">
+        <input
+          type="text"
+          className="w-full px-4 py-2 border-2 border-transparent rounded-md shadow-sm focus:outline-none bg-white text-gray-900 placeholder-gray-400"
+          placeholder="Your display name"
+          value={onboardingData.displayName}
+          onChange={(e) =>
+            updateOnboardingData({ displayName: e.target.value })
+          }
+          disabled={isLoading}
+        />
+      </div>
 
+      {error && (
+        <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+      )}
+
+      {/* Continue button with gradient */}
       <button
         onClick={handleNext}
-        className="w-full px-6 py-3 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-300"
+        className="w-full text-center px-6 py-3 text-white text-xl font-bold rounded-lg 
+                            bg-gradient-to-r from-sky-500 to-purple-600 
+                            hover:from-sky-600 hover:to-purple-700 
+                            transition duration-300 shadow-lg disabled:from-sky-300 disabled:to-purple-400"
         disabled={isLoading}
       >
         {isLoading ? "Saving..." : "Continue"}
       </button>
-    </>
+    </div>
   );
 };
 

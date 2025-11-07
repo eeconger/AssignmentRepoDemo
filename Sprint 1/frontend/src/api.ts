@@ -60,3 +60,21 @@ export const apiUpdateOnboardingProfile = async (data: any, token: string) => {
 
   return response.text();
 };
+
+export const apiGetUserProfile = async (token: string) => {
+  const response = await fetch(`${BASE_URL}/profile`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText);
+  }
+
+  return response.json();
+};
