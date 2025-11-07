@@ -9,10 +9,10 @@ const gradientTextClass =
   "bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-purple-600";
 
 const CreateAccountPage: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [username, setUsername] = useState(() => localStorage.getItem("createAccount_username") || "");
+  const [password, setPassword] = useState(() => localStorage.getItem("createAccount_password") || "");
+  const [email, setEmail] = useState(() => localStorage.getItem("createAccount_email") || "");
+  const [termsAccepted, setTermsAccepted] = useState(() => localStorage.getItem("createAccount_termsAccepted") === "true");
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -49,6 +49,11 @@ const CreateAccountPage: React.FC = () => {
         password,
         termsAccepted,
       });
+      // Clear form data from localStorage on successful account creation
+      localStorage.removeItem("createAccount_username");
+      localStorage.removeItem("createAccount_email");
+      localStorage.removeItem("createAccount_password");
+      localStorage.removeItem("createAccount_termsAccepted");
       login(token);
       navigate("/onboarding/display-name");
     } catch (err: any) {
@@ -79,7 +84,10 @@ const CreateAccountPage: React.FC = () => {
                 type="text"
                 id="username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  localStorage.setItem("createAccount_username", e.target.value);
+                }}
                 required
                 className="w-full px-4 py-2 border-2 border-transparent rounded-md focus:outline-none bg-white text-gray-900 placeholder-gray-400"
                 placeholder="Choose your username"
@@ -100,7 +108,10 @@ const CreateAccountPage: React.FC = () => {
                 type="text"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  localStorage.setItem("createAccount_email", e.target.value);
+                }}
                 required
                 className="w-full px-4 py-2 border-2 border-transparent rounded-md focus:outline-none bg-white text-gray-900 placeholder-gray-400"
                 placeholder="Enter your email address"
@@ -121,7 +132,10 @@ const CreateAccountPage: React.FC = () => {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  localStorage.setItem("createAccount_password", e.target.value);
+                }}
                 required
                 className="w-full px-4 py-2 pr-16 border-2 border-transparent rounded-md focus:outline-none bg-white text-gray-900 placeholder-gray-400"
                 aria-describedby="password-hint"
@@ -146,12 +160,22 @@ const CreateAccountPage: React.FC = () => {
               type="checkbox"
               id="terms"
               checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
+              onChange={(e) => {
+                setTermsAccepted(e.target.checked);
+                localStorage.setItem("createAccount_termsAccepted", e.target.checked.toString());
+              }}
               className="h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
             />
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
               I accept the Terms & Conditions
             </label>
+            <Link
+              to="/terms"
+              className="ml-2 w-5 h-5 rounded-full bg-gradient-to-r from-sky-500 to-purple-600 text-white text-xs flex items-center justify-center hover:from-sky-600 hover:to-purple-700 transition duration-200"
+              title="View Terms & Conditions"
+            >
+              ?
+            </Link>
           </div>
 
           {error && (

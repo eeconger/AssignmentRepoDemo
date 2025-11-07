@@ -74,31 +74,31 @@ const PositiveHabitsPage: React.FC = () => {
 
       <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4 w-full">
         <div className="flex flex-wrap gap-3 justify-center">
-          {POSITIVE_HABITS.map((habit) => {
-            const isSelected = onboardingData.positiveHabits.includes(habit);
+        {POSITIVE_HABITS.map((habit) => {
+          const isSelected = onboardingData.positiveHabits.includes(habit);
 
-            const baseClasses =
-              "px-4 py-2 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
+          const baseClasses =
+            "px-4 py-2 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
 
-            // SELECTED: Button has the gradient background and white text
-            const selectedClasses =
-              "bg-gradient-to-r from-sky-500 to-purple-600 text-white border-transparent";
+          // SELECTED: Button has the gradient background and white text
+          const selectedClasses =
+            "bg-gradient-to-r from-sky-500 to-purple-600 text-white border-transparent";
 
-            // UNSELECTED: Button has gradient text, white background, and a subtle border
-            const unselectedClasses = `${gradientTextClass} bg-white border-purple-200 hover:border-purple-600`;
+          // UNSELECTED: Button has gradient text, white background, and a subtle border
+          const unselectedClasses = `${gradientTextClass} bg-white border-purple-200 hover:border-purple-600`;
 
-            return (
-              <button
-                key={habit}
-                onClick={() => handleToggleHabit(habit)}
-                className={`${baseClasses} ${
-                  isSelected ? selectedClasses : unselectedClasses
-                }`}
-              >
-                {habit}
-              </button>
-            );
-          })}
+          return (
+            <button
+              key={habit}
+              onClick={() => handleToggleHabit(habit)}
+              className={`${baseClasses} ${
+                isSelected ? selectedClasses : unselectedClasses
+              }`}
+            >
+              {habit}
+            </button>
+          );
+        })}
         </div>
       </div>
 

@@ -85,31 +85,31 @@ const EditPositiveStatesPage: React.FC = () => {
 
           <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
             <div className="flex flex-wrap gap-3 justify-center">
-              {POSITIVE_STATES.map((state) => {
-                const isSelected = selectedStates.includes(state);
+            {POSITIVE_STATES.map((state) => {
+              const isSelected = selectedStates.includes(state);
 
-                const baseClasses =
-                  "px-4 py-2 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
+              const baseClasses =
+                "px-4 py-2 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
 
-                // SELECTED: Uses the Blue-to-Purple gradient background
-                const selectedClasses =
-                  "bg-gradient-to-r from-sky-500 to-purple-600 text-white border-transparent";
+              // SELECTED: Uses the Blue-to-Purple gradient background
+              const selectedClasses =
+                "bg-gradient-to-r from-sky-500 to-purple-600 text-white border-transparent";
 
-                // UNSELECTED: Uses the Blue-to-Purple gradient for text, white background, and a soft purple border
-                const unselectedClasses = `${gradientTextClass} bg-white border-purple-200 hover:border-purple-600`;
+              // UNSELECTED: Uses the Blue-to-Purple gradient for text, white background, and a soft purple border
+              const unselectedClasses = `${gradientTextClass} bg-white border-purple-200 hover:border-purple-600`;
 
-                return (
-                  <button
-                    key={state}
-                    onClick={() => toggleState(state)}
-                    className={`${baseClasses} ${
-                      isSelected ? selectedClasses : unselectedClasses
-                    }`}
-                  >
-                    {state}
-                  </button>
-                );
-              })}
+              return (
+                <button
+                  key={state}
+                  onClick={() => toggleState(state)}
+                  className={`${baseClasses} ${
+                    isSelected ? selectedClasses : unselectedClasses
+                  }`}
+                >
+                  {state}
+                </button>
+              );
+            })}
             </div>
           </div>
 

@@ -40,6 +40,11 @@ const EditNegativeHabitsPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (selectedHabits.length < 3) {
+      alert("Please select at least 3 negative habits.");
+      return;
+    }
+
     setSaving(true);
     try {
       await apiUpdateOnboardingProfile(
@@ -73,41 +78,41 @@ const EditNegativeHabitsPage: React.FC = () => {
 
         <div className="bg-white p-0 w-full mb-6">
           <p className="text-lg text-gray-700 mb-6 text-center">
-            Select negative habits you want to change:
+            Select at least 3 negative habits you want to change:
           </p>
 
           <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
             <div className="flex flex-wrap gap-3 justify-center">
-              {NEGATIVE_HABITS.map((habit) => {
-                const isSelected = selectedHabits.includes(habit);
+            {NEGATIVE_HABITS.map((habit) => {
+              const isSelected = selectedHabits.includes(habit);
 
-                const baseClasses =
-                  "px-4 py-2 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
+              const baseClasses =
+                "px-4 py-2 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
 
-                // SELECTED: Uses the Purple-to-Red gradient background
-                const selectedClasses =
-                  "bg-gradient-to-r from-purple-500 to-red-600 text-white border-transparent";
+              // SELECTED: Uses the Purple-to-Red gradient background
+              const selectedClasses =
+                "bg-gradient-to-r from-purple-500 to-red-600 text-white border-transparent";
 
-                // UNSELECTED: Uses the Purple-to-Red gradient for text, white background, and a soft red border
-                const unselectedClasses = `${negativeGradientClass} bg-white border-red-200 hover:border-red-600`;
+              // UNSELECTED: Uses the Purple-to-Red gradient for text, white background, and a soft red border
+              const unselectedClasses = `${negativeGradientClass} bg-white border-red-200 hover:border-red-600`;
 
-                return (
-                  <button
-                    key={habit}
-                    onClick={() => toggleHabit(habit)}
-                    className={`${baseClasses} ${
-                      isSelected ? selectedClasses : unselectedClasses
-                    }`}
-                  >
-                    {habit}
-                  </button>
-                );
-              })}
+              return (
+                <button
+                  key={habit}
+                  onClick={() => toggleHabit(habit)}
+                  className={`${baseClasses} ${
+                    isSelected ? selectedClasses : unselectedClasses
+                  }`}
+                >
+                  {habit}
+                </button>
+              );
+            })}
             </div>
           </div>
 
           <p className="text-sm text-gray-500 mt-4 text-center">
-            Selected: {selectedHabits.length}
+            Selected: {selectedHabits.length} (minimum 3 required)
           </p>
         </div>
 
@@ -123,7 +128,7 @@ const EditNegativeHabitsPage: React.FC = () => {
           {/* Save Button with NEGATIVE Gradient (Purple to Red) */}
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || selectedHabits.length < 3}
             className={negativeButtonClass}
           >
             {saving ? "Saving..." : "Save Changes"}

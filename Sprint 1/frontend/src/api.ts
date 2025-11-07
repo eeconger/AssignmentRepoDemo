@@ -60,6 +60,7 @@ export const apiUpdateOnboardingProfile = async (data: any, token: string) => {
 
   return response.text();
 };
+
 export const apiGetUserProfile = async (token: string) => {
   const response = await fetch(`${BASE_URL}/profile`, {
     method: "GET",

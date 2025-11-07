@@ -41,7 +41,6 @@ const ListCard: React.FC<{
   return (
     // Card now has relative positioning for the icon and hover effect
     <div className="bg-white rounded-xl shadow-lg p-6 border border-purple-100 relative group hover:shadow-xl transition duration-300">
-      {/* EDIT ICON: Visible only on hover (group-hover:opacity-100) */}
       <button
         onClick={onEdit}
         className={`absolute top-4 right-4 p-2 rounded-full bg-white/80 opacity-0 group-hover:opacity-100 ${iconColor} hover:bg-gray-100 transition duration-300`}
@@ -143,7 +142,9 @@ const DashboardPage: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className={`text-5xl font-extrabold ${positiveGradientClass}`}>
+          <h1
+            className={`text-5xl font-extrabold ${positiveGradientClass} pb-1`}
+          >
             Welcome, {userProfile.displayName}!
           </h1>
         </div>

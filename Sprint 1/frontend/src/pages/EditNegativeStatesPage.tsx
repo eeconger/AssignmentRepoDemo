@@ -40,6 +40,11 @@ const EditNegativeStatesPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (selectedStates.length < 3) {
+      alert("Please select at least 3 negative states.");
+      return;
+    }
+
     setSaving(true);
     try {
       await apiUpdateOnboardingProfile(
@@ -73,41 +78,41 @@ const EditNegativeStatesPage: React.FC = () => {
 
         <div className="bg-white p-0 w-full mb-6">
           <p className="text-lg text-gray-700 mb-6 text-center">
-            Select negative states you want to track:
+            Select at least 3 negative states you want to track:
           </p>
 
           <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
             <div className="flex flex-wrap gap-3 justify-center">
-              {NEGATIVE_STATES.map((state) => {
-                const isSelected = selectedStates.includes(state);
+            {NEGATIVE_STATES.map((state) => {
+              const isSelected = selectedStates.includes(state);
 
-                const baseClasses =
-                  "px-4 py-2 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
+              const baseClasses =
+                "px-4 py-2 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
 
-                // SELECTED: Uses the Purple-to-Red gradient background
-                const selectedClasses =
-                  "bg-gradient-to-r from-purple-500 to-red-600 text-white border-transparent";
+              // SELECTED: Uses the Purple-to-Red gradient background
+              const selectedClasses =
+                "bg-gradient-to-r from-purple-500 to-red-600 text-white border-transparent";
 
-                // UNSELECTED: Uses the Purple-to-Red gradient for text, white background, and a soft red border
-                const unselectedClasses = `${negativeGradientClass} bg-white border-red-200 hover:border-red-600`;
+              // UNSELECTED: Uses the Purple-to-Red gradient for text, white background, and a soft red border
+              const unselectedClasses = `${negativeGradientClass} bg-white border-red-200 hover:border-red-600`;
 
-                return (
-                  <button
-                    key={state}
-                    onClick={() => toggleState(state)}
-                    className={`${baseClasses} ${
-                      isSelected ? selectedClasses : unselectedClasses
-                    }`}
-                  >
-                    {state}
-                  </button>
-                );
-              })}
+              return (
+                <button
+                  key={state}
+                  onClick={() => toggleState(state)}
+                  className={`${baseClasses} ${
+                    isSelected ? selectedClasses : unselectedClasses
+                  }`}
+                >
+                  {state}
+                </button>
+              );
+            })}
             </div>
           </div>
 
           <p className="text-sm text-gray-500 mt-4 text-center">
-            Selected: {selectedStates.length}
+            Selected: {selectedStates.length} (minimum 3 required)
           </p>
         </div>
 
@@ -123,7 +128,7 @@ const EditNegativeStatesPage: React.FC = () => {
           {/* Save Button with NEGATIVE Gradient (Purple to Red) */}
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || selectedStates.length < 3}
             className={negativeButtonClass}
           >
             {saving ? "Saving..." : "Save Changes"}

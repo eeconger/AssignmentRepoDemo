@@ -59,27 +59,27 @@ const NegativeStatesPage: React.FC = () => {
   };
 
   return (
-    // ⭐️ CHANGE 1: Removed 'min-h-screen' and 'justify-center'. Added 'pt-12 pb-20' for minimal required padding.
-    <div className="flex flex-col items-center bg-white pt-12 pb-20">
-      {/* ⭐️ CHANGE 2: Removed 'm-4' (margin all around) and replaced with 'mx-4' to only enforce horizontal spacing. */}
+    <div className="flex flex-col items-center bg-white pt-8 pb-12">
+      {/* Inner content container */}
       <div className="w-full max-w-md mx-4">
         {/* HEADING uses the new negativeGradientClass (Purple/Red) */}
         <h2
-          className={`text-3xl font-bold mb-6 text-center ${negativeGradientClass}`}
+          className={`text-3xl font-bold mb-4 text-center ${negativeGradientClass}`}
         >
           Select Negative States
         </h2>
 
-        <p className="text-lg text-gray-700 mb-6 text-center">
+        <p className="text-lg text-gray-700 mb-4 text-center">
           Which states do you commonly experience?
         </p>
 
+        {/* Scrollable list container (max height constraint) */}
         <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
           <div className="flex flex-wrap gap-3 justify-center">
             {NEGATIVE_STATES.map((state) => {
               const isSelected = onboardingData.negativeStates.includes(state);
 
-              // ⭐️ CHANGE 4: Reduced vertical padding from 'py-2' to 'py-1.5' for a shorter button
+              // Reduced vertical padding from py-2 to py-1.5 for a shorter button
               const baseClasses =
                 "px-4 py-1.5 rounded-full text-base font-semibold transition duration-200 shadow-sm border";
 
@@ -105,8 +105,8 @@ const NegativeStatesPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Added the required states text back in as it was missing from the last section */}
-        <p className="text-sm text-gray-500 mt-4 text-center mb-6">
+        {/* ⭐️ CHANGE 4: Reduced bottom margin from mb-6 to mb-4 */}
+        <p className="text-sm text-gray-500 mt-4 text-center mb-4">
           Selected: {onboardingData.negativeStates.length} (minimum 3 required)
         </p>
 
@@ -115,13 +115,15 @@ const NegativeStatesPage: React.FC = () => {
         )}
 
         {/* Primary Button (Continue) uses the negativeButtonClass (Purple/Red) */}
-        <button
-          onClick={handleNext}
-          className={negativeButtonClass}
-          disabled={isLoading || onboardingData.negativeStates.length < 3} // Ensure disabled state is correct
-        >
-          {isLoading ? "Saving..." : "Continue"}
-        </button>
+        <div className="w-full mt-4">
+          <button
+            onClick={handleNext}
+            className={negativeButtonClass}
+            disabled={isLoading || onboardingData.negativeStates.length < 3}
+          >
+            {isLoading ? "Saving..." : "Continue"}
+          </button>
+        </div>
       </div>
     </div>
   );
