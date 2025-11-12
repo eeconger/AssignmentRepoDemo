@@ -75,9 +75,10 @@ const ActionButton: React.FC<{
   icon: React.ReactNode;
   gradientFrom: string;
   gradientTo: string;
-}> = ({ title, icon, gradientFrom, gradientTo }) => (
+  onAction: () => void;
+}> = ({ title, icon, gradientFrom, gradientTo, onAction }) => (
   <button
-    onClick={() => console.log(`Clicked ${title}`)}
+    onClick={() => onAction()}
     className={`flex flex-col items-center justify-center w-32 h-32 rounded-full text-white font-bold text-sm 
                   bg-gradient-to-br ${gradientFrom} ${gradientTo} shadow-xl 
                   hover:scale-[1.03] transition duration-200 ease-in-out transform`}
@@ -156,12 +157,14 @@ const DashboardPage: React.FC = () => {
             icon={<Smile className="w-10 h-10" />}
             gradientFrom="from-sky-500"
             gradientTo="to-purple-600"
+            onAction={() => navigate("/logMood")}
           />
           <ActionButton
             title="Log Food"
             icon={<Utensils className="w-10 h-10" />}
             gradientFrom="from-orange-500"
             gradientTo="to-yellow-500"
+            onAction={() => navigate("/logFood")}
           />
         </div>
 
