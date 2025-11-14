@@ -115,22 +115,19 @@ const FoodLogger: React.FC = () => {
         group: keyof FoodGroups; portion: keyof PortionSizes;
     } | null>(null);
 
-    // Load data from localStorage on mount (New Functionality)
+    // Load data from localStorage on mount
     useEffect(() => {
         const storedData = localStorage.getItem('logging_meal');
         if (storedData) {
             try {
                 const parsedData = JSON.parse(storedData);
                 
-                // Populate states if data is present
-                if (parsedData.meal) setSelectedMeal(parsedData.meal);
+                // Load 'mealType' key from the new structure
+                if (parsedData.mealType) setSelectedMeal(parsedData.mealType);
                 if (parsedData.notes) setNotes(parsedData.notes);
-                // Deep copy to ensure state is properly initialized/updated
                 if (parsedData.data) setFoodData(parsedData.data);
             } catch (e) {
                 console.error("Error parsing stored meal data:", e);
-                // Optional: Clear bad data if parsing fails
-                // localStorage.removeItem('logging_meal');
             }
         }
     }, []);
@@ -194,9 +191,11 @@ const FoodLogger: React.FC = () => {
             return;
         }
 
-        // Combine meal type, notes, and food data into one payload object
+        // --- UPDATED data structure to match the request ---
         const mealLogData = {
-            meal: selectedMeal, data: foodData, notes: notes, timestamp: new Date().toISOString(),
+            mealType: selectedMeal,
+            data: foodData,
+            notes: notes,
         };
 
         // Store the data in localStorage

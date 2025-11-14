@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {useAuth} from "../context/AuthContext";
 import {useNavigate} from "react-router-dom";
-import {apiGetUserProfile} from "../api";
+import {apiGetUserProfile, apiUserLog} from "../api";
 
 // This wrapper function allows the component to be used directly in routing.
 export default function LogMoodPage() {
@@ -126,20 +126,17 @@ const MoodLogger: React.FC = () => {
         // 3. "Submit" the data (e.g., to your API)
         console.log("Submitting Daily Log:", dailyLogPayload);
         try {
-            // Example of where you would call the API
-            // await apiSubmitDailyLog(token, dailyLogPayload);
+            await apiUserLog(dailyLogPayload, token!);
+            localStorage.removeItem("logging_meal");
+            localStorage.removeItem("logging_positiveHabits");
+            localStorage.removeItem("logging_negativeHabits");
+            navigate("/dashboard");
         } catch (error) {
             console.error("Failed to submit daily log:", error);
+            alert("Failed to save changes. Please try again.");
+        } finally {
             setSubmitting(false);
-            // Optionally show an error message to the user here
-            return;
         }
-
-        // 4. Clean up localStorage and navigate
-        localStorage.removeItem("logging_meal");
-        localStorage.removeItem("logging_positiveHabits");
-        localStorage.removeItem("logging_negativeHabits");
-        navigate("/dashboard");
     };
 
     // --- Render ---

@@ -1,4 +1,3 @@
-// src/api.ts
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 export const apiCreateAccount = async (data: any) => {
@@ -18,7 +17,6 @@ export const apiCreateAccount = async (data: any) => {
 };
 
 /**
- * NEW FUNCTION
  * Signs a user in using Basic Authentication
  */
 export const apiSignIn = async (email: string, password: string) => {
@@ -69,6 +67,28 @@ export const apiGetUserProfile = async (token: string) => {
       Authorization: `Bearer ${token}`,
     },
     credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText);
+  }
+
+  return response.json();
+};
+
+/**
+ * Logs food, habits, or other user data to the profile log endpoint.
+ */
+export const apiUserLog = async (data: any, token: string) => {
+  const response = await fetch(`${BASE_URL}/profile/log`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "include",
+    body: JSON.stringify(data),
   });
 
   if (!response.ok) {
