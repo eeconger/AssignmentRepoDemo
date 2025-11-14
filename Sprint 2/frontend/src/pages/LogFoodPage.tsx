@@ -1,14 +1,21 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Minus } from "lucide-react";
+// Removed import { ArrowLeft, Plus, Minus } from "lucide-react";
+
+// This wrapper function allows the component to be used directly in routing.
+export default function LogFoodPage() {
+    return (
+        <FoodLogger />
+    );
+}
 
 // Custom class for gradient text (matching project style)
 const gradientTextClass =
-  "bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-purple-600";
+  "bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600"; // Used blue-500 consistent with MoodLogger
 
 // Gradient button class (matching project style)
 const primaryButtonClass =
-  "w-full px-6 py-3 text-white text-xl font-bold rounded-lg bg-gradient-to-r from-sky-500 to-purple-600 hover:from-sky-600 hover:to-purple-700 transition duration-300 shadow-lg";
+  "w-full px-6 py-3 text-white text-xl font-bold rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90 transition duration-300 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2";
 
 type PortionSizes = {
   fist: number;
@@ -24,7 +31,11 @@ type FoodGroups = {
   fruits: PortionSizes;
 };
 
-const LogFoodPage: React.FC = () => {
+/**
+ * A component for users to log their food intake using
+ * portion size estimates (fist, palm, thumb).
+ */
+const FoodLogger: React.FC = () => {
   const [selectedMeal, setSelectedMeal] = useState<string>("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +120,14 @@ const LogFoodPage: React.FC = () => {
       return;
     }
 
+    // In a real application, you would send the foodData and notes to an API here.
+    console.log("Submitting food log:", {
+      meal: selectedMeal,
+      data: foodData,
+      notes: notes,
+      timestamp: new Date().toISOString(),
+    });
+
     setSuccess(`Your ${selectedMeal} has been logged successfully!`);
 
     // Reset form
@@ -129,13 +148,26 @@ const LogFoodPage: React.FC = () => {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-orange-50 p-4 sm:p-8">
       <div className="w-full max-w-2xl">
-        {/* Back button */}
+        {/* Back button (Updated to match style of MoodLogger back button) */}
         <Link to="/dashboard">
           <button
             type="button"
-            className="mb-6 flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="mb-6 flex items-center rounded-lg px-4 py-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            {/* SVG for ArrowLeft replacement */}
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-4 w-4 mr-2" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+                <path d="M19 12H5"/>
+                <path d="M12 19l-7-7 7-7"/>
+            </svg>
             Back to Dashboard
           </button>
         </Link>
@@ -163,7 +195,7 @@ const LogFoodPage: React.FC = () => {
                     onClick={() => setSelectedMeal(meal)}
                     className={`px-6 py-4 rounded-xl border-2 transition-all duration-300 font-medium ${
                       selectedMeal === meal
-                        ? "bg-gradient-to-r from-sky-500 to-purple-600 text-white border-transparent shadow-lg scale-105"
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-transparent shadow-lg"
                         : "border-gray-200 hover:border-purple-300 hover:shadow-md text-gray-700"
                     }`}
                   >
@@ -196,7 +228,10 @@ const LogFoodPage: React.FC = () => {
                         onClick={() => addPortion(group.name, portion.name)}
                         className="px-4 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-purple-300 transition-all duration-200 text-sm font-medium flex items-center gap-2 text-gray-700"
                       >
-                        <Plus className="w-3 h-3" />
+                        {/* Replacement for Plus Icon */}
+                        <span className="w-3 h-3 flex items-center justify-center font-bold text-lg leading-none p-0 m-0 pb-1">
+                          +
+                        </span>
                         <span>{portion.icon}</span>
                         <span className="capitalize">{portion.name}</span>
                       </button>
@@ -232,7 +267,7 @@ const LogFoodPage: React.FC = () => {
             {hasAnyFood() && (
               <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl">
                 <h3 className="font-semibold text-gray-900 mb-3">
-                  Your {selectedMeal || "Meal"}
+                  Your {selectedMeal || "Meal"} Summary
                 </h3>
                 <div className="space-y-2 text-sm">
                   {foodGroups.map((group) => {
@@ -285,7 +320,10 @@ const LogFoodPage: React.FC = () => {
                 type="submit"
                 className={`${primaryButtonClass} flex items-center justify-center`}
               >
-                <Plus className="w-5 h-5 mr-2" />
+                {/* Replacement for Plus Icon (Used a slightly larger one here) */}
+                <span className="w-5 h-5 flex items-center justify-center font-bold text-2xl leading-none mr-2 p-0 m-0 pb-1">
+                  +
+                </span>
                 Log Meal
               </button>
             </div>
@@ -341,7 +379,10 @@ const LogFoodPage: React.FC = () => {
                 }
                 className="p-2 rounded-lg border-2 border-gray-200 hover:border-purple-300 hover:bg-gray-50 transition-colors"
               >
-                <Minus className="w-4 h-4 text-gray-700" />
+                {/* Replacement for Minus Icon */}
+                <span className="w-4 h-4 flex items-center justify-center font-bold text-xl leading-none p-0 m-0 pb-1">
+                  -
+                </span>
               </button>
               <span className="text-4xl font-bold w-16 text-center text-gray-900">
                 {foodData[editingGroup.group][editingGroup.portion]}
@@ -357,7 +398,10 @@ const LogFoodPage: React.FC = () => {
                 }
                 className="p-2 rounded-lg border-2 border-gray-200 hover:border-purple-300 hover:bg-gray-50 transition-colors"
               >
-                <Plus className="w-4 h-4 text-gray-700" />
+                {/* Replacement for Plus Icon */}
+                <span className="w-4 h-4 flex items-center justify-center font-bold text-xl leading-none p-0 m-0 pb-1">
+                  +
+                </span>
               </button>
             </div>
             <button
@@ -373,6 +417,3 @@ const LogFoodPage: React.FC = () => {
     </div>
   );
 };
-
-export default LogFoodPage;
-
