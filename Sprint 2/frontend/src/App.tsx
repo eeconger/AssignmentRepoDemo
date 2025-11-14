@@ -33,6 +33,7 @@ import EditPositiveHabitsPage from "./pages/EditPositiveHabitsPage";
 import EditNegativeHabitsPage from "./pages/EditNegativeHabitsPage";
 import LogHabitPage from "./pages/LogHabitPage";
 import LogFoodPage from "./pages/LogFoodPage";
+import LogMoodPage from "./pages/LogMoodPage";
 
 export default function App() {
   return (
@@ -104,6 +105,10 @@ export default function App() {
         <Route
           path="/log/habits"
           element={<LogHabitPage />}
+        />
+        <Route
+          path="/log/mood"
+          element={<LogMoodPage />}
         />
         <Route
           path="/log/food"

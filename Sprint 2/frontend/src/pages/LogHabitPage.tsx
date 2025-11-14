@@ -20,8 +20,14 @@ const HabitLogger: React.FC = () => {
   const navigate = useNavigate(); // Included based on your snippet
   
   // --- State ---
-  const [availableHabits, setAvailableHabits] = useState<string[]>([]);
-  const [selectedHabits, setSelectedHabits] = useState<Set<string>>(new Set());
+  // Store available habits separated by type
+  const [availablePositiveHabits, setAvailablePositiveHabits] = useState<string[]>([]);
+  const [availableNegativeHabits, setAvailableNegativeHabits] = useState<string[]>([]);
+
+  // Store selected habits in separate Sets for efficient toggling
+  const [selectedPositiveHabits, setSelectedPositiveHabits] = useState<Set<string>>(new Set());
+  const [selectedNegativeHabits, setSelectedNegativeHabits] = useState<Set<string>>(new Set());
+  
   const [loading, setLoading] = useState(true);
 
   // --- Data Fetching ---
@@ -34,15 +40,11 @@ const HabitLogger: React.FC = () => {
       try {
         setLoading(true);
         const profile = await apiGetUserProfile(token);
-        // Combine positive and negative habits into one list for logging
-        const allHabits = [
-          ...(profile.positiveHabits || []),
-          ...(profile.negativeHabits || []),
-        ];
-        setAvailableHabits(allHabits);
+        // Set positive and negative habits in their own state
+        setAvailablePositiveHabits(profile.positiveHabits || []);
+        setAvailableNegativeHabits(profile.negativeHabits || []);
       } catch (error) {
         console.error('Failed to load user habits:', error);
-        // You could add an error state here to show a message to the user
       } finally {
         setLoading(false);
       }
@@ -55,9 +57,15 @@ const HabitLogger: React.FC = () => {
   /**
    * Toggles the selection state of a habit.
    * @param habitLabel - The habit string to toggle.
+   * @param type - The category of the habit ('positive' or 'negative').
    */
-  const handleToggleHabit = (habitLabel: string) => {
-    setSelectedHabits((prevSelected) => {
+  const handleToggleHabit = (habitLabel: string, type: 'positive' | 'negative') => {
+    // Dynamically choose which state updater to call
+    const stateUpdater = type === 'positive' 
+      ? setSelectedPositiveHabits 
+      : setSelectedNegativeHabits;
+
+    stateUpdater((prevSelected) => {
       const newSelected = new Set(prevSelected);
       if (newSelected.has(habitLabel)) {
         newSelected.delete(habitLabel);
@@ -69,40 +77,51 @@ const HabitLogger: React.FC = () => {
   };
 
   /**
-   * Handles the "Done" button click.
-   * This would typically send the data to a REST API.
+   * Saves the selected habits to localStorage and navigates to the mood logger.
    */
   const handleSubmit = () => {
-    const habitsToLog = Array.from(selectedHabits);
-    console.log('Submitting habits:', habitsToLog);
-    // e.g., api.post('/logs/daily-habits', { habits: habitsToLog, token });
-    // navigate('/dashboard'); // Example usage of navigate
+    // Convert Sets to arrays for storage
+    const positiveHabitsToLog = Array.from(selectedPositiveHabits);
+    const negativeHabitsToLog = Array.from(selectedNegativeHabits);
+
+    localStorage.setItem('logging_positiveHabits', JSON.stringify(positiveHabitsToLog));
+    localStorage.setItem('logging_negativeHabits', JSON.stringify(negativeHabitsToLog));
+    
+    navigate("/log/mood");
   };
 
   /**
-   * Handles the "Skip" button click.
+   * Saves empty arrays to localStorage (for the "skip" action) 
+   * and navigates to the mood logger.
    */
   const handleSkip = () => {
-    console.log('User skipped logging.');
-    // navigate('/dashboard'); // Example usage of navigate
+    localStorage.setItem('logging_positiveHabits', JSON.stringify([]));
+    localStorage.setItem('logging_negativeHabits', JSON.stringify([]));
+    
+    navigate("/log/mood");
+  };
+
+  /**
+   * Clears habit data from localStorage and returns to the dashboard.
+   */
+  const handleCancel = () => {
+    localStorage.removeItem('logging_positiveHabits');
+    localStorage.removeItem('logging_negativeHabits');
+    
+    navigate("/dashboard");
   };
 
   // --- Helper ---
   /**
    * Generates the image URL for a given habit label.
-   * Replaces spaces with underscores and appends .png.
-   * @param label - The habit label (e.g., "Excessive Screen Time")
-   * @returns The public image path (e.g., "/images/Excessive_Screen_Time.png")
    */
   const getImageUrl = (label: string): string => {
-    // Use a regex with the global flag to replace all spaces
     const imageName = label.replace(/ /g, '_');
     return `/images/${imageName}.png`;
   };
 
   // --- Render ---
 
-  // Handle Loading State
   if (loading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-orange-50 p-4">
@@ -114,24 +133,22 @@ const HabitLogger: React.FC = () => {
   }
 
   return (
-    // Main container with the light orange/cream background
     <div className="flex min-h-screen w-full items-center justify-center bg-orange-50 p-4 sm:p-8">
-      {/* Card-based layout, matching the design language */}
       <div className="w-full max-w-3xl rounded-xl bg-white p-6 shadow-lg sm:p-10">
         
-        {/* Header Title */}
         <h2 className="mb-8 text-center text-3xl font-bold text-gray-800">
           What did you do today?
         </h2>
 
         {/* Grid of selectable habits */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
-          {availableHabits.map((habitLabel) => {
-            const isSelected = selectedHabits.has(habitLabel);
+          {/* Render Positive Habits */}
+          {availablePositiveHabits.map((habitLabel) => {
+            const isSelected = selectedPositiveHabits.has(habitLabel);
             return (
               <button
-                key={habitLabel} // Use the habit string as the key
-                onClick={() => handleToggleHabit(habitLabel)}
+                key={habitLabel}
+                onClick={() => handleToggleHabit(habitLabel, 'positive')}
                 type="button"
                 className={`
                   overflow-hidden rounded-lg border-2 shadow-sm transition-all
@@ -143,20 +160,46 @@ const HabitLogger: React.FC = () => {
                   }
                 `}
               >
-                {/* --- MODIFIED SECTION ---
-                  Replaced the placeholder div with an <img> tag.
-                  - src calls the getImageUrl helper.
-                  - alt provides accessibility.
-                  - className maintains the aspect ratio, sets object-fit,
-                    and provides a fallback background color.
-                */}
                 <img
                   src={getImageUrl(habitLabel)}
                   alt={habitLabel}
                   className="aspect-[11/8] w-full object-cover bg-gray-200"
                 />
-                
-                {/* Habit Label */}
+                <div
+                  className={`
+                    p-3 text-center text-sm font-medium sm:text-base
+                    ${isSelected ? 'bg-purple-50 text-purple-800' : 'bg-white text-gray-700'}
+                  `}
+                >
+                  {habitLabel}
+                </div>
+              </button>
+            );
+          })}
+          
+          {/* Render Negative Habits */}
+          {availableNegativeHabits.map((habitLabel) => {
+            const isSelected = selectedNegativeHabits.has(habitLabel);
+            return (
+              <button
+                key={habitLabel}
+                onClick={() => handleToggleHabit(habitLabel, 'negative')}
+                type="button"
+                className={`
+                  overflow-hidden rounded-lg border-2 shadow-sm transition-all
+                  focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2
+                  ${
+                    isSelected
+                      ? 'border-purple-600 ring-2 ring-purple-300'
+                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  }
+                `}
+              >
+                <img
+                  src={getImageUrl(habitLabel)}
+                  alt={habitLabel}
+                  className="aspect-[11/8] w-full object-cover bg-gray-200"
+                />
                 <div
                   className={`
                     p-3 text-center text-sm font-medium sm:text-base
@@ -172,6 +215,15 @@ const HabitLogger: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          {/* NEW Cancel Button */}
+          <button
+            onClick={handleCancel}
+            type="button"
+            className="rounded-lg px-8 py-2.5 font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+          >
+            Cancel
+          </button>
+
           <button
             onClick={handleSkip}
             type="button"
@@ -190,7 +242,7 @@ const HabitLogger: React.FC = () => {
               focus:ring-purple-500 focus:ring-offset-2
             "
           >
-            Done
+            Next
           </button>
         </div>
         
