@@ -157,14 +157,14 @@ const DashboardPage: React.FC = () => {
             icon={<Smile className="w-10 h-10" />}
             gradientFrom="from-sky-500"
             gradientTo="to-purple-600"
-            onAction={() => navigate("/logMood")}
+            onAction={() => navigate("/log/habits")}
           />
           <ActionButton
             title="Log Food"
             icon={<Utensils className="w-10 h-10" />}
             gradientFrom="from-orange-500"
             gradientTo="to-yellow-500"
-            onAction={() => navigate("/logFood")}
+            onAction={() => navigate("/log/food")}
           />
         </div>
 
