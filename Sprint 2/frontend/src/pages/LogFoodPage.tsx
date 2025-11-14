@@ -170,6 +170,8 @@ const FoodLogger: React.FC = () => {
         localStorage.removeItem('logging_meal');
         localStorage.removeItem('logging_positiveHabits');
         localStorage.removeItem('logging_negativeHabits');
+        localStorage.removeItem('logging_positiveStates');
+        localStorage.removeItem('logging_negativeStates');
         
         navigate("/dashboard");
     };

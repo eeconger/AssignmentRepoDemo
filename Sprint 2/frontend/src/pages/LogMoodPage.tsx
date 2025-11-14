@@ -11,6 +11,27 @@ export default function LogMoodPage() {
 // --- Types ---
 type MoodRatings = Record<string, number>;
 
+// Helper to safely parse JSON from localStorage
+const safeParseJson = (key: string): MoodRatings => {
+    const stored = localStorage.getItem(key);
+    if (stored) {
+        try {
+            // Note: If stored data is not an object (e.g., "[]" or a string), this might fail.
+            // MoodRatings is expected to be { [state: string]: number }, so we default to {}
+            // if parsing fails or returns a non-object.
+            const parsed = JSON.parse(stored);
+            if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+                return parsed;
+            }
+            return {};
+        } catch (e) {
+            console.error(`Failed to parse data for key: ${key}`, e);
+            return {};
+        }
+    }
+    return {};
+}
+
 /**
  * A component for users to log their daily moods using sliders.
  * It fetches the user's tracked states from their profile.
@@ -23,7 +44,6 @@ const MoodLogger: React.FC = () => {
     const navigate = useNavigate();
 
     // --- State ---
-    // Separated states for explicit positive/negative tracking
     const [positiveAvailableStates, setPositiveAvailableStates] = useState<string[]>([]);
     const [negativeAvailableStates, setNegativeAvailableStates] = useState<string[]>([]);
 
@@ -33,7 +53,7 @@ const MoodLogger: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
-    // --- Data Fetching ---
+    // --- Data Fetching and LocalStorage Initialization ---
     useEffect(() => {
         const fetchStates = async () => {
             if (!token) {
@@ -42,29 +62,41 @@ const MoodLogger: React.FC = () => {
             }
             try {
                 setLoading(true);
+                // Load existing data from localStorage first (Requirement 2)
+                const storedPositiveRatings = safeParseJson("logging_positiveStates");
+                const storedNegativeRatings = safeParseJson("logging_negativeStates");
+                
+                // Fetch profile to get the currently tracked states
                 const profile = await apiGetUserProfile(token);
 
+                // Note: Using profile.positiveStates and profile.negativeStates (as per original logic from user's snippet)
                 const posStates = profile.positiveStates || [];
                 const negStates = profile.negativeStates || [];
 
                 setPositiveAvailableStates(posStates);
                 setNegativeAvailableStates(negStates);
 
-                // Initialize positive mood ratings to 0 ("Unset")
+                // Initialize positive mood ratings
                 const initialPositiveRatings: MoodRatings = {};
                 posStates.forEach((state: string) => {
-                    initialPositiveRatings[state] = 0;
+                    // Use stored value if it exists for this state, otherwise default to 0
+                    initialPositiveRatings[state] = storedPositiveRatings[state] !== undefined
+                        ? storedPositiveRatings[state]
+                        : 0;
                 });
                 setPositiveMoodRatings(initialPositiveRatings);
 
-                // Initialize negative mood ratings to 0 ("Unset")
+                // Initialize negative mood ratings
                 const initialNegativeRatings: MoodRatings = {};
                 negStates.forEach((state: string) => {
-                    initialNegativeRatings[state] = 0;
+                    // Use stored value if it exists for this state, otherwise default to 0
+                    initialNegativeRatings[state] = storedNegativeRatings[state] !== undefined
+                        ? storedNegativeRatings[state]
+                        : 0;
                 });
                 setNegativeMoodRatings(initialNegativeRatings);
             } catch (error) {
-                console.error("Failed to load user states:", error);
+                console.error("Failed to load user states or initial data:", error);
             } finally {
                 setLoading(false);
             }
@@ -76,9 +108,6 @@ const MoodLogger: React.FC = () => {
 
     /**
      * Updates the rating for a specific mood state.
-     * @param state The mood state being changed (e.g., "Calm").
-     * @param value The new rating (0-5).
-     * @param isPositive True if the state is positive, false if negative.
      */
     const handleSliderChange = (state: string, value: number, isPositive: boolean) => {
         if (isPositive) {
@@ -95,15 +124,17 @@ const MoodLogger: React.FC = () => {
     };
 
     /**
-     * Navigates back to the habit logger.
+     * Saves current mood ratings to localStorage before navigating back. (Requirement 1)
      */
     const handleBack = () => {
+        localStorage.setItem("logging_positiveStates", JSON.stringify(positiveMoodRatings));
+        localStorage.setItem("logging_negativeStates", JSON.stringify(negativeMoodRatings));
+
         navigate("/log/habits");
     };
 
     /**
-     * Gathers all data (habits + moods) and formats the final payload.
-     * This now uses the pre-separated positive and negative mood ratings.
+     * Gathers all data (habits + moods), submits, and clears localStorage. (Requirement 3)
      */
     const handleSubmit = async () => {
         setSubmitting(true);
@@ -113,13 +144,13 @@ const MoodLogger: React.FC = () => {
         const positiveHabits = JSON.parse(localStorage.getItem("logging_positiveHabits") || "[]");
         const negativeHabits = JSON.parse(localStorage.getItem("logging_negativeHabits") || "[]");
 
-        // 2. Format the final payload using the separated state objects
+        // 2. Format the final payload
         const dailyLogPayload = {
             meal: meal,
             positiveHabits: positiveHabits,
             negativeHabits: negativeHabits,
-            positiveStates: positiveMoodRatings, // Directly use the positive state object
-            negativeStates: negativeMoodRatings, // Directly use the negative state object
+            positiveStates: positiveMoodRatings, 
+            negativeStates: negativeMoodRatings, 
             loggedAt: new Date().toISOString() // ISO timestamp
         };
 
@@ -127,9 +158,14 @@ const MoodLogger: React.FC = () => {
         console.log("Submitting Daily Log:", dailyLogPayload);
         try {
             await apiUserLog(dailyLogPayload, token!);
+            
+            // 4. Clear all relevant keys from localStorage on success
             localStorage.removeItem("logging_meal");
             localStorage.removeItem("logging_positiveHabits");
             localStorage.removeItem("logging_negativeHabits");
+            localStorage.removeItem("logging_positiveStates");
+            localStorage.removeItem("logging_negativeStates");
+
             navigate("/dashboard");
         } catch (error) {
             console.error("Failed to submit daily log:", error);
@@ -164,7 +200,9 @@ const MoodLogger: React.FC = () => {
                 <div className="space-y-8">
                     {allStatesToRender.map(({state, isPositive}) => {
                         const currentRatings = isPositive ? positiveMoodRatings : negativeMoodRatings;
-                        const setRatings = isPositive ? setPositiveMoodRatings : setNegativeMoodRatings;
+
+                        // Ensure we use the state name to look up the current rating value, defaulting to 0
+                        const currentValue = currentRatings[state] !== undefined ? currentRatings[state] : 0;
 
                         return (
                             <div key={state}>
@@ -177,7 +215,7 @@ const MoodLogger: React.FC = () => {
                                     min="0"
                                     max="5"
                                     step="1"
-                                    value={currentRatings[state] || 0}
+                                    value={currentValue}
                                     onChange={(e) => handleSliderChange(state, parseInt(e.target.value), isPositive)}
                                     className="
                     mt-2 w-full cursor-pointer appearance-none rounded-lg

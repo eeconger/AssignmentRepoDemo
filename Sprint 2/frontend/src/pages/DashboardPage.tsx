@@ -152,13 +152,13 @@ const DashboardPage: React.FC = () => {
 
         {/* ACTION BUTTONS Section */}
         <div className="flex justify-center space-x-8 mb-12">
-          <ActionButton
+          {/* <ActionButton
             title="Log Mood"
             icon={<Smile className="w-10 h-10" />}
             gradientFrom="from-sky-500"
             gradientTo="to-purple-600"
             onAction={() => navigate("/log/habits")}
-          />
+          /> */}
           <ActionButton
             title="Log Food"
             icon={<Utensils className="w-10 h-10" />}
