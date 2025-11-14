@@ -5,4 +5,4 @@ package-lock.json
 # test.http
 *rsa*
 dist/
-.DS_Store
+**/.DS_Store
