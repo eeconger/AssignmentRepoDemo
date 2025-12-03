@@ -1,0 +1,19 @@
+POST http://localhost:3000/auth
+content-type: application/json
+
+{
+    "username": "hazelbelmont",
+    "password": "equanimity",
+    "displayName": "Hazel Belmont",
+    "email": "belmonth@vcu.edu"
+}
+
+###
+
+GET http://localhost:3000/auth
+Authorization: Basic hazelbelmont:equanimity
+
+###
+
+GET http://localhost:3000/auth
+Authorization: Bearer 0e6dbcc9-8091-4ea5-9d36-ada7e126a0ba
