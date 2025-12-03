@@ -301,6 +301,94 @@ export default class MongoDB {
         ]);
     }
 
+    /**
+     * Retrieves aggregated log data for correlation analysis between habits/food and mood.
+     * The result is an array of documents, each representing a single logged entry,
+     * normalized for easy processing on the frontend.
+     *
+     * @param username The user's username identifier.
+     * @returns Promise that resolves to an array of normalized log entries.
+     */
+    public async getCorrelationData(username: string): Promise<any[]> {
+        const pipeline = [
+            // 1. Find the specific user document
+            {$match: {username: username}},
+            // 2. Deconstruct the 'data' array into individual documents (one per log entry)
+            {$unwind: "$data"},
+            // 3. Project the necessary fields into a cleaner structure
+            {$project: {
+                _id: 0,
+                // Mood: Extract the positiveStates and negativeStates objects
+                // These will be used in the TypeScript mapping below to calculate the score accurately.
+                positiveStates: "$data.positiveStates",
+                negativeStates: "$data.negativeStates",
+
+                // Habits: Keep the array of habit names
+                positiveHabits: "$data.positiveHabits",
+                negativeHabits: "$data.negativeHabits",
+
+                // Food: Calculate the correct weighted total servings for each food group
+                foodServings: {
+                    vegetables: {$sum: [
+                        "$data.meal.data.vegetables.fist",
+                        {$multiply: [{$ifNull: ["$data.meal.data.vegetables.palm", 0]}, 0.5]},
+                        {$multiply: [{$ifNull: ["$data.meal.data.vegetables.thumb", 0]}, 0.25]}
+                    ]},
+                    protein: {$sum: [
+                        "$data.meal.data.protein.fist",
+                        {$multiply: [{$ifNull: ["$data.meal.data.protein.palm", 0]}, 0.5]},
+                        {$multiply: [{$ifNull: ["$data.meal.data.protein.thumb", 0]}, 0.25]}
+                    ]},
+                    grains: {$sum: [
+                        "$data.meal.data.grains.fist",
+                        {$multiply: [{$ifNull: ["$data.meal.data.grains.palm", 0]}, 0.5]},
+                        {$multiply: [{$ifNull: ["$data.meal.data.grains.thumb", 0]}, 0.25]}
+                    ]},
+                    dairy: {$sum: [
+                        "$data.meal.data.dairy.fist",
+                        {$multiply: [{$ifNull: ["$data.meal.data.dairy.palm", 0]}, 0.5]},
+                        {$multiply: [{$ifNull: ["$data.meal.data.dairy.thumb", 0]}, 0.25]}
+                    ]},
+                    fruits: {$sum: [
+                        "$data.meal.data.fruits.fist",
+                        {$multiply: [{$ifNull: ["$data.meal.data.fruits.palm", 0]}, 0.5]},
+                        {$multiply: [{$ifNull: ["$data.meal.data.fruits.thumb", 0]}, 0.25]}
+                    ]},
+                },
+
+                // Timestamp for sequencing
+                loggedAt: "$data.loggedAt"
+            }},
+            // 4. Sort by timestamp (optional but good practice)
+            {$sort: {loggedAt: 1}}
+        ];
+
+        // Execute the pipeline and return the results as an array
+        const result = await this.getUserLoggingCollection().aggregate(pipeline).toArray();
+
+        // Final processing in TypeScript to calculate the Net Mood Score
+        return result.map(entry => {
+            // Calculate total positive score (sum of all values in the object)
+            const rawPositiveScore = Object.values(entry.positiveStates || {}).reduce((sum: number, score: any) => sum + (score || 0), 0);
+            
+            // Calculate total negative score (sum of all values in the object)
+            const rawNegativeScore = Object.values(entry.negativeStates || {}).reduce((sum: number, score: any) => sum + (score || 0), 0);
+            
+            return {
+                timestamp: entry.loggedAt,
+                foodServings: entry.foodServings,
+                positiveHabits: entry.positiveHabits || [],
+                negativeHabits: entry.negativeHabits || [],
+                // Net Mood Score is the primary value for correlation
+                netMoodScore: rawPositiveScore - rawNegativeScore,
+                rawPositiveScore: rawPositiveScore,
+                rawNegativeScore: rawNegativeScore,
+            };
+        });
+        
+    }
+
+
     // Currently unused.
     public bsonToJson(bson: any[]): any[] {
         return bson.map((inputItem) => {

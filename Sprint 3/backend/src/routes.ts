@@ -175,6 +175,8 @@ export class Routes {
                 })
                 .catch(() => res.status(500).send("Server error during profile update."));
         });
+        
+        // Route to log user activity (food, habits, mood)
         app.post("/profile/log", (req, res) => {
             // The request body contains the activity log data (food, habits, etc.)
             const logData = req.body;
@@ -193,9 +195,7 @@ export class Routes {
                         return res.status(401).send("Invalid or expired session.");
                     }
 
-                    // 2. Placeholder for MongoDB interaction:
-                    // This function will be implemented later to save the logData
-                    // to a dedicated activity/log collection for the userEmail.
+                    // 2. Save the logData
                     const logSuccessful = await this.mongo.logUserActivity(userEmail, logData);
 
                     if (logSuccessful) {
@@ -211,32 +211,37 @@ export class Routes {
                 });
         });
 
-        // POST /calculate/states
-        // body: { logs: [ ... ], startDate?: string, endDate?: string }
-        app.post("/calculate/states", (req, res) => {
-            try {
-                const {logs, startDate, endDate} = (req.body || {}) as any;
-                if (!Array.isArray(logs)) return res.status(400).send("Missing or invalid `logs` array in request body");
-                const result = computeStateStats(logs, {startDate, endDate});
-                res.json(result);
-            } catch (err) {
-                console.error(err);
-                res.status(500).send("Server error while computing state stats");
+        // New route to fetch correlation data for frontend charting
+        // UC04: Get insights (Correlation)
+        app.get("/profile/insights/correlation", (req, res) => {
+            const authHeader = req.header("Authorization");
+            if (!authHeader || !authHeader.startsWith("Bearer ")) {
+                return res.status(401).send("Unauthorized: Missing Bearer token.");
             }
-        });
+            const accessToken: string = authHeader.substring("Bearer ".length);
 
-        // POST /calculate/habits
-        // body: { logs: [ ... ], startDate?: string, endDate?: string, bucket?: 'daily'|'weekly' }
-        app.post("/calculate/habits", (req, res) => {
-            try {
-                const {logs, startDate, endDate, bucket} = (req.body || {}) as any;
-                if (!Array.isArray(logs)) return res.status(400).send("Missing or invalid `logs` array in request body");
-                const result = computeHabitFrequency(logs, {startDate, endDate, bucket});
-                res.json(result);
-            } catch (err) {
-                console.error(err);
-                res.status(500).send("Server error while computing habit frequency");
-            }
+            // 1. Check authorization and get user email
+            this.mongo
+                .getUserBySession(accessToken)
+                .then(async (userEmail) => {
+                    if (!userEmail) {
+                        return res.status(401).send("Invalid or expired session.");
+                    }
+
+                    // 2. Fetch the normalized correlation data
+                    const correlationData = await this.mongo.getCorrelationData(userEmail);
+
+                    // 3. Return the data, which is structured for easy charting (e.g., scatter plot, line graph)
+                    if (correlationData) {
+                        res.status(200).json(correlationData);
+                    } else {
+                        res.status(404).send("No log data found for correlation analysis.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching correlation data:", error);
+                    res.status(500).send("Server error fetching correlation data.");
+                });
         });
     }
 }

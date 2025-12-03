@@ -34,27 +34,20 @@ import EditNegativeHabitsPage from "./pages/EditNegativeHabitsPage";
 import LogHabitPage from "./pages/LogHabitPage";
 import LogFoodPage from "./pages/LogFoodPage";
 import LogMoodPage from "./pages/LogMoodPage";
+import InsightsPage from "./pages/InsightsPage";
 
 export default function App() {
   return (
     <Routes>
-      {/* Auth routes (user is logged out) */}
+      {/* Authentication and Onboarding flow */}
       <Route element={<AuthLayout />}>
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/signin" element={<SignInPage />} />
-        <Route path="/register" element={<CreateAccountPage />} />
+        <Route path="/create-account" element={<CreateAccountPage />} />
         <Route path="/terms" element={<TermsAndConditionsPage />} />
         <Route path="/signout" element={<SignOut />} />
-      </Route>
 
-      {/* Onboarding wizard (user is logged in) */}
-      <Route element={<ProtectedRoute />}>
-        {" "}
-        {/* Ensures user is logged in */}
         <Route element={<OnboardingLayout />}>
-          {" "}
-          {/* Wraps all steps */}
           <Route
             path="/onboarding/display-name"
             element={<DisplayNamePage />}
@@ -102,18 +95,11 @@ export default function App() {
           path="/edit/negative-habits"
           element={<EditNegativeHabitsPage />}
         />
-        <Route
-          path="/log/habits"
-          element={<LogHabitPage />}
-        />
-        <Route
-          path="/log/mood"
-          element={<LogMoodPage />}
-        />
-        <Route
-          path="/log/food"
-          element={<LogFoodPage />}
-        />
+        <Route path="/log/habits" element={<LogHabitPage />} />
+        <Route path="/log/mood" element={<LogMoodPage />} />
+        <Route path="/log/food" element={<LogFoodPage />} />
+        {/* NEW INSIGHTS ROUTE */}
+        <Route path="/insights" element={<InsightsPage />} />
       </Route>
 
       {/* Fallback: redirect to the root path */}

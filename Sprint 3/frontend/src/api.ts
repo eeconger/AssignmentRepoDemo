@@ -1,5 +1,25 @@
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
+// --- Types for Correlation Data ---
+export interface FoodServings {
+  vegetables: number;
+  protein: number;
+  grains: number;
+  dairy: number;
+  fruits: number;
+}
+
+export interface CorrelationLogEntry {
+  timestamp: string;
+  foodServings: FoodServings;
+  positiveHabits: string[];
+  negativeHabits: string[];
+  netMoodScore: number;
+  rawPositiveScore: number;
+  rawNegativeScore: number;
+}
+// ----------------------------------
+
 export const apiCreateAccount = async (data: any) => {
   const response = await fetch(`${BASE_URL}/auth`, {
     method: "POST",
@@ -97,4 +117,27 @@ export const apiUserLog = async (data: any, token: string) => {
   }
 
   return response.json();
+};
+
+
+/**
+ * Retrieves aggregated log data for correlation insights.
+ */
+export const apiGetCorrelationData = async (token: string): Promise<CorrelationLogEntry[]> => {
+    const response = await fetch(`${BASE_URL}/profile/insights/correlation`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+    }
+
+    // The backend returns an array of CorrelationLogEntry
+    return response.json();
 };
