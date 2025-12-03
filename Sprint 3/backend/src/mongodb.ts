@@ -321,7 +321,7 @@ export default class MongoDB {
                         _id: {
                             $dateToString: {format: "%Y-%m-%d", date: "$data.loggedAt"}
                         },
-                        // Calculate total servings for each food group per day
+                        // Calculate total servings for each food group per day and round to 2 decimal places
                         vegetables: {
                             $sum: {
                                 $add: [
@@ -372,17 +372,17 @@ export default class MongoDB {
                         negativeStates: {$push: "$data.negativeStates"},
                     }
                 },
-                // 4. Project to calculate daily averages for moods
+                // 4. Project to calculate daily averages for moods and round food servings
                 {
                     $project: {
                         _id: 0,
                         date: "$_id",
                         foodServings: {
-                            vegetables: "$vegetables",
-                            protein: "$protein",
-                            grains: "$grains",
-                            dairy: "$dairy",
-                            fruits: "$fruits"
+                            vegetables: {$round: ["$vegetables", 2]},
+                            protein: {$round: ["$protein", 2]},
+                            grains: {$round: ["$grains", 2]},
+                            dairy: {$round: ["$dairy", 2]},
+                            fruits: {$round: ["$fruits", 2]}
                         },
                         // We will average the states in the final step
                         positiveStates: "$positiveStates",
@@ -412,7 +412,8 @@ export default class MongoDB {
                 });
     
                 for (const [state, values] of Object.entries(allPositiveStates)) {
-                    avgPositiveStates[state] = values.reduce((a, b) => a + b, 0) / values.length;
+                    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+                    avgPositiveStates[state] = Math.round(avg * 100) / 100;
                 }
                 
                 const avgNegativeStates: {[key: string]: number} = {};
@@ -430,14 +431,25 @@ export default class MongoDB {
                 });
     
                 for (const [state, values] of Object.entries(allNegativeStates)) {
-                    avgNegativeStates[state] = values.reduce((a, b) => a + b, 0) / values.length;
+                    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+                    avgNegativeStates[state] = Math.round(avg * 100) / 100;
                 }
+
+                const allPositiveValues = Object.values(avgPositiveStates);
+                const overallAvgPositiveRaw = allPositiveValues.length > 0 ? allPositiveValues.reduce((a, b) => a + b, 0) / allPositiveValues.length : 0;
+                const overallAvgPositive = Math.round(overallAvgPositiveRaw * 100) / 100;
+
+                const allNegativeValues = Object.values(avgNegativeStates);
+                const overallAvgNegativeRaw = allNegativeValues.length > 0 ? allNegativeValues.reduce((a, b) => a + b, 0) / allNegativeValues.length : 0;
+                const overallAvgNegative = Math.round(overallAvgNegativeRaw * 100) / 100;
     
                 return {
                     date: dailyData.date,
                     foodServings: dailyData.foodServings,
                     positiveStates: avgPositiveStates,
                     negativeStates: avgNegativeStates,
+                    avgPositiveState: overallAvgPositive,
+                    avgNegativeState: overallAvgNegative,
                 };
             });
         }

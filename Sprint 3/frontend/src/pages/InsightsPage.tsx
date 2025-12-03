@@ -113,6 +113,32 @@ const InsightsPage: React.FC = () => {
                     </LineChart>
                 </ResponsiveContainer>
             </div>
+
+            <h2 className="text-xl font-semibold mt-8 mb-2">Average Mood vs. Food Intake Summary</h2>
+
+            <div style={{ width: '100%', height: 400 }}>
+                <ResponsiveContainer>
+                    <LineChart
+                        data={chartData}
+                        margin={{
+                            top: 5, right: 30, left: 20, bottom: 5,
+                        }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        
+                        <Line type="monotone" dataKey="avgPositiveState" name="Avg. Positive Mood" stroke="#22c55e" />
+                        <Line type="monotone" dataKey="avgNegativeState" name="Avg. Negative Mood" stroke="#ef4444" />
+
+                        {allFoodGroups.map((group, index) => (
+                           visibleLines[group] && <Line key={group} type="monotone" dataKey={(payload: DailyInsight) => payload.foodServings[group as keyof typeof payload.foodServings]} name={group} stroke={COLORS[index % COLORS.length]} strokeDasharray="5 5" />
+                        ))}
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
         </div>
     );
 };

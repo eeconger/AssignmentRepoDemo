@@ -26,6 +26,8 @@ export interface DailyInsight {
     foodServings: FoodServings;
     positiveStates: { [key: string]: number };
     negativeStates: { [key: string]: number };
+    avgPositiveState: number;
+    avgNegativeState: number;
 }
 
 export interface InsightsResponse {
