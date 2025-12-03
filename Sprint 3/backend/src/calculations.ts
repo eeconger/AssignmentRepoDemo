@@ -113,4 +113,41 @@ export function computeHabitFrequency(logs: LogEntry[], options?: {startDate?: s
   };
 }
 
-export default {computeStateStats, computeHabitFrequency};
+export function generateInsights(dailyData: any[]): string {
+    const highIntakeDays = [];
+    const lowIntakeDays = [];
+
+    for (const day of dailyData) {
+        const {foodServings, positiveStates} = day;
+        if (foodServings && positiveStates) {
+            const vegProtein = (foodServings.vegetables || 0) + (foodServings.protein || 0);
+            const grains = foodServings.grains || 0;
+            const totalPositiveMood = Object.values(positiveStates).reduce((sum: number, value: any) => sum + value, 0);
+
+            if (vegProtein > grains) {
+                highIntakeDays.push({totalPositiveMood});
+            } else {
+                lowIntakeDays.push({totalPositiveMood});
+            }
+        }
+    }
+
+    if (highIntakeDays.length < 2 || lowIntakeDays.length < 2) {
+        return "Keep logging your meals and moods to see new insights here!";
+    }
+
+    const avgHighIntakeMood = highIntakeDays.reduce((sum, day) => sum + day.totalPositiveMood, 0) / highIntakeDays.length;
+    const avgLowIntakeMood = lowIntakeDays.reduce((sum, day) => sum + day.totalPositiveMood, 0) / lowIntakeDays.length;
+
+    const difference = avgHighIntakeMood - avgLowIntakeMood;
+
+    if (difference > 0.5) {
+        return `On days you ate more vegetables and protein than grains, your average positive mood rating was ${difference.toFixed(1)} points higher!`;
+    } else if (difference < -0.5) {
+        return `On days you ate more grains than vegetables and protein, your average positive mood rating was ${Math.abs(difference).toFixed(1)} points higher!`;
+    } else {
+        return "We're still analyzing your data. Keep logging to uncover more detailed insights about your diet and mood.";
+    }
+}
+
+export default {computeStateStats, computeHabitFrequency, generateInsights};

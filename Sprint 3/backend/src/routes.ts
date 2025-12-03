@@ -2,7 +2,7 @@
 import {Application} from "express";
 import MongoDB from "./mongodb";
 import Security from "./security";
-import { computeHabitFrequency, computeStateStats } from "./calculations";
+import { computeHabitFrequency, computeStateStats, generateInsights } from "./calculations";
 
 export class Routes {
     private mongo: MongoDB;
@@ -211,9 +211,7 @@ export class Routes {
                 });
         });
 
-        // New route to fetch correlation data for frontend charting
-        // UC04: Get insights (Correlation)
-        app.get("/profile/insights/correlation", (req, res) => {
+        app.get("/api/insights", (req, res) => {
             const authHeader = req.header("Authorization");
             if (!authHeader || !authHeader.startsWith("Bearer ")) {
                 return res.status(401).send("Unauthorized: Missing Bearer token.");
@@ -228,19 +226,28 @@ export class Routes {
                         return res.status(401).send("Invalid or expired session.");
                     }
 
-                    // 2. Fetch the normalized correlation data
-                    const correlationData = await this.mongo.getCorrelationData(userEmail);
+                    // 2. Fetch the daily aggregated data
+                    const dailyData = await this.mongo.getCorrelationData(userEmail);
 
-                    // 3. Return the data, which is structured for easy charting (e.g., scatter plot, line graph)
-                    if (correlationData) {
-                        res.status(200).json(correlationData);
-                    } else {
-                        res.status(404).send("No log data found for correlation analysis.");
+                    if (!dailyData || dailyData.length === 0) {
+                        return res.status(200).json({
+                            insight: "Keep logging your meals and moods to see new insights here!",
+                            chartData: []
+                        });
                     }
+                    
+                    // 3. Generate the insight text
+                    const insight = generateInsights(dailyData);
+
+                    // 4. Return both the data for the chart and the insight
+                    res.status(200).json({
+                        insight: insight,
+                        chartData: dailyData
+                    });
                 })
                 .catch((error) => {
-                    console.error("Error fetching correlation data:", error);
-                    res.status(500).send("Server error fetching correlation data.");
+                    console.error("Error fetching insights data:", error);
+                    res.status(500).send("Server error fetching insights data.");
                 });
         });
     }

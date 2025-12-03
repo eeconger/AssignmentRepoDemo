@@ -1,0 +1,358 @@
+{
+  "_id": {
+    "$oid": "6902c357594592c6ae7ca581"
+  },
+  "username": "hazelbelmont",
+  "preferredPositiveHabits": [
+    "Planning the Day",
+    "Connecting with Loved Ones",
+    "Exercise",
+    "Meditation"
+  ],
+  "preferredNegativeHabits": [
+    "Junk Food",
+    "Excessive Screen Time",
+    "Impulse Buying",
+    "Avoiding Responsibilities"
+  ],
+  "preferredPositiveStates": [
+    "Happy",
+    "Calm",
+    "Relaxed",
+    "Peaceful"
+  ],
+  "preferredNegativeStates": [
+    "Overwhelmed",
+    "Stressed",
+    "Bored"
+  ],
+  "data": [
+    {
+      "meal": {
+        "mealType": "Breakfast",
+        "data": {
+          "vegetables": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 1
+          },
+          "protein": {
+            "fist": 0,
+            "palm": 1,
+            "thumb": 0
+          },
+          "grains": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "dairy": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "fruits": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          }
+        },
+        "notes": "NOTES!"
+      },
+      "positiveHabits": [
+        "Connecting with Loved Ones"
+      ],
+      "negativeHabits": [
+        "Avoiding Responsibilities",
+        "Junk Food"
+      ],
+      "positiveStates": {
+        "Happy": 0,
+        "Relaxed": 3,
+        "Optimistic": 4
+      },
+      "negativeStates": {
+        "Bored": 0,
+        "Overwhelmed": 2,
+        "Anxious": 3
+      },
+      "loggedAt": {
+        "$date": "2025-11-14T20:12:33.323Z"
+      }
+    },
+    {
+      "meal": {
+        "mealType": "Dinner",
+        "data": {
+          "vegetables": {
+            "fist": 0,
+            "palm": 1,
+            "thumb": 0
+          },
+          "protein": {
+            "fist": 1,
+            "palm": 0,
+            "thumb": 0
+          },
+          "grains": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 1
+          },
+          "dairy": {
+            "fist": 0,
+            "palm": 1,
+            "thumb": 0
+          },
+          "fruits": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          }
+        },
+        "notes": ""
+      },
+      "positiveHabits": [
+        "Connecting with Loved Ones"
+      ],
+      "negativeHabits": [
+        "Avoiding Responsibilities",
+        "Junk Food"
+      ],
+      "positiveStates": {
+        "Happy": 0,
+        "Relaxed": 4,
+        "Optimistic": 2
+      },
+      "negativeStates": {
+        "Bored": 0,
+        "Overwhelmed": 0,
+        "Anxious": 0
+      },
+      "loggedAt": {
+        "$date": "2025-11-15T20:59:30.449Z"
+      }
+    },
+    {
+      "meal": {
+        "mealType": "Dinner",
+        "data": {
+          "vegetables": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 1
+          },
+          "protein": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "grains": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "dairy": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "fruits": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          }
+        },
+        "notes": "dsf"
+      },
+      "positiveHabits": [
+        "Connecting with Loved Ones",
+        "Planning the Day",
+        "Meditation",
+        "Exercise"
+      ],
+      "negativeHabits": [
+        "Junk Food",
+        "Excessive Screen Time",
+        "Impulse Buying",
+        "Avoiding Responsibilities"
+      ],
+      "positiveStates": {
+        "Happy": 0,
+        "Relaxed": 0,
+        "Optimistic": 0
+      },
+      "negativeStates": {
+        "Bored": 2,
+        "Overwhelmed": 4,
+        "Anxious": 4
+      },
+      "loggedAt": {
+        "$date": "2025-11-16T20:59:46.262Z"
+      }
+    },
+    {
+      "meal": {
+        "mealType": "Dinner",
+        "data": {
+          "vegetables": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 1
+          },
+          "protein": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "grains": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "dairy": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "fruits": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          }
+        },
+        "notes": ""
+      },
+      "positiveHabits": [
+        "Exercise",
+        "Connecting with Loved Ones"
+      ],
+      "negativeHabits": [
+        "Excessive Screen Time"
+      ],
+      "positiveStates": {
+        "Happy": 4,
+        "Calm": 0,
+        "Relaxed": 0
+      },
+      "negativeStates": {
+        "Overwhelmed": 0,
+        "Stressed": 2,
+        "Bored": 0
+      },
+      "loggedAt": {
+        "$date": "2025-11-17T21:37:42.097Z"
+      }
+    },
+    {
+      "meal": {
+        "mealType": "Snack",
+        "data": {
+          "vegetables": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 1
+          },
+          "protein": {
+            "fist": 0,
+            "palm": 1,
+            "thumb": 0
+          },
+          "grains": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "dairy": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          },
+          "fruits": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          }
+        },
+        "notes": ""
+      },
+      "positiveHabits": [
+        "Connecting with Loved Ones",
+        "Planning the Day"
+      ],
+      "negativeHabits": [
+        "Junk Food"
+      ],
+      "positiveStates": {
+        "Happy": 3,
+        "Calm": 0,
+        "Relaxed": 0
+      },
+      "negativeStates": {
+        "Overwhelmed": 0,
+        "Stressed": 0,
+        "Bored": 0
+      },
+      "loggedAt": {
+        "$date": "2025-11-18T21:41:36.378Z"
+      }
+    },
+    {
+      "meal": {
+        "mealType": "Lunch",
+        "data": {
+          "vegetables": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 1
+          },
+          "protein": {
+            "fist": 1,
+            "palm": 0,
+            "thumb": 0
+          },
+          "grains": {
+            "fist": 0,
+            "palm": 1,
+            "thumb": 0
+          },
+          "dairy": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 1
+          },
+          "fruits": {
+            "fist": 0,
+            "palm": 0,
+            "thumb": 0
+          }
+        },
+        "notes": "Burrito"
+      },
+      "positiveHabits": [
+        "Exercise",
+        "Meditation"
+      ],
+      "negativeHabits": [
+        "Junk Food",
+        "Impulse Buying"
+      ],
+      "positiveStates": {
+        "Happy": 0,
+        "Calm": 1,
+        "Relaxed": 5,
+        "Peaceful": 0
+      },
+      "negativeStates": {
+        "Overwhelmed": 2,
+        "Stressed": 0,
+        "Bored": 5
+      },
+      "loggedAt": {
+        "$date": "2025-11-15T19:04:50.825Z"
+      }
+    }
+  ],
+  "displayName": "Hazel",
+  "onboardingComplete": true
+}
